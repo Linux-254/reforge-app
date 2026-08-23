@@ -277,8 +277,10 @@
 
 ## Supabase Auth migration preparation
 
-- [ ] Create a private GitHub repository for ReForge and push the current verified checkpoint as the baseline
+- [x] Create a private GitHub repository for ReForge and push the current verified checkpoint as the baseline
 - [ ] Inspect Supabase connector/project availability and capture required setup values
 - [ ] Prepare a staging-only Supabase Auth migration plan without changing production authentication
 - [ ] Validate Supabase Auth compatibility with existing Drizzle schema, RBAC, encryption, and supporter consent flows
 - [ ] Document Supabase setup, redirect URLs, migration risks, and rollback steps
+- [x] Verify private repository metadata, intended baseline SHA, remote branch presence, and save a checkpoint
+- [ ] Save a new reviewable checkpoint after the GitHub repository-baseline verification files and TODO updates
