@@ -1,10 +1,20 @@
+import { useState } from "react";
 import { Link } from "wouter";
 import { ArrowRight, Leaf, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { startLogin } from "@/const";
 import { natureAsset } from "@/config/assets";
+import { getSupabaseAuthClient, startSupabaseGoogleSignIn, supabaseAuthEnabled } from "@/lib/supabaseAuth";
 
 export default function SignIn() {
+  const [supabaseLoading, setSupabaseLoading] = useState(false);
+
+  async function handleSupabaseSignIn() {
+    setSupabaseLoading(true);
+    const result = await startSupabaseGoogleSignIn();
+    if (result.error) setSupabaseLoading(false);
+  }
+
   return (
     <main className="relative min-h-[calc(100vh-4.6rem)] overflow-hidden bg-[oklch(0.96_0.025_105)]">
       <img src={natureAsset("signIn")} alt="Soft light through green leaves" className="absolute inset-0 h-full w-full object-cover opacity-45" />
@@ -23,6 +33,11 @@ export default function SignIn() {
           <h2 id="sign-in-title" className="mt-7 font-serif text-3xl text-[oklch(0.3_0.055_145)]">Sign in gently</h2>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">Use your secure ReForge account to continue. Your sensitive reflections remain private and encrypted.</p>
           <Button size="lg" className="mt-8 h-12 w-full rounded-full" onClick={() => startLogin()}>Continue with secure sign-in <ArrowRight className="ml-2 h-4 w-4" /></Button>
+          {supabaseAuthEnabled && getSupabaseAuthClient() ? (
+            <Button variant="outline" size="lg" className="mt-3 h-12 w-full rounded-full" disabled={supabaseLoading} onClick={handleSupabaseSignIn}>
+              {supabaseLoading ? "Opening Supabase sign-in…" : "Try Supabase staging sign-in"}
+            </Button>
+          ) : null}
           <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">By continuing, you agree to our <Link href="/terms" className="text-primary underline">Terms</Link> and <Link href="/privacy" className="text-primary underline">Privacy</Link>.</p>
           <Link href="/" className="mt-7 block text-center text-sm text-foreground/60 hover:text-primary">Not ready? Explore ReForge first</Link>
         </section>
