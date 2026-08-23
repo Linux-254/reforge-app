@@ -478,6 +478,16 @@ export async function getActiveGoals(userId: number) {
     .orderBy(desc(goals.createdAt));
 }
 
+export async function getActiveGoalsWithProgress(userId: number) {
+  const activeGoals = await getActiveGoals(userId);
+  return Promise.all(activeGoals.map(async goal => {
+    const steps = await getGoalSteps(userId, goal.id);
+    const completedStepCount = steps.filter(step => step.doneAt != null).length;
+    const nextStep = steps.find(step => step.doneAt == null);
+    return { ...goal, stepCount: steps.length, completedStepCount, nextStepTitle: nextStep?.title ?? null };
+  }));
+}
+
 export async function deleteGoal(userId: number, goalId: number) {
   const db = await getDb();
   if (!db) return;

@@ -161,7 +161,7 @@ export const appRouter = router({
         ctx.user.id,
         "evening"
       );
-      const activeGoals = await db.getActiveGoals(ctx.user.id);
+      const activeGoals = await db.getActiveGoalsWithProgress(ctx.user.id);
 
       return {
         profile,

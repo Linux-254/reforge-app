@@ -60,11 +60,11 @@
 - [x] Display whole-life progress across 21 dimensions
 - [x] Add sober-day streak counter
 - [x] Add mood trend visualization
-- [ ] Add today's check-in prompt
-- [ ] Add upcoming goals preview
+- [x] Add today's check-in prompt
+- [x] Add upcoming goals preview
 - [x] Implement skeleton loading states
 - [x] Implement empty states
-- [ ] Add quick-exit affordance for privacy
+- [x] Add quick-exit affordance for privacy
 
 ### Daily Check-ins
 - [ ] Build morning check-in form (mood, energy, cravings)
@@ -268,3 +268,6 @@
 - [x] Promote verified ReForge changes through GitHub branches features -> dev -> staging -> main
 - [x] Add a discreet quick-exit affordance to the authenticated shell with keyboard-accessible navigation away from private screens
 - [x] Add an accessible dashboard mood trend visualization backed by recent check-in history
+- [x] Add an explicit empty state to the dashboard goals preview
+- [x] Replace misleading hardcoded goal progress with real progress or a clearly non-progress presentation
+- [x] Surface upcoming-goal information with an honest next-step or horizon summary
