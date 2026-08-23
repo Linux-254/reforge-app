@@ -23,19 +23,19 @@
 - [x] Create protected and public procedure wrappers
 
 ### Public Marketing Website
-- [ ] Define comprehensive visual direction (warm, non-clinical, compassionate)
+- [x] Define comprehensive visual direction (warm, non-clinical, compassionate)
 - [x] Build landing page hero section
-- [ ] Build about page with mission and values
-- [ ] Build how-it-works page (4-phase journey)
-- [ ] Build dimensions explainer page
-- [ ] Build daily-practice walkthrough page
-- [ ] Build success indicators page
-- [ ] Build FAQ page
-- [ ] Build for-supporters page
-- [ ] Build contact page
+- [x] Build about page with mission and values
+- [x] Build how-it-works page (4-phase journey)
+- [x] Build dimensions explainer page
+- [x] Build daily-practice walkthrough page
+- [x] Build success indicators page
+- [x] Build FAQ page
+- [x] Build for-supporters page
+- [x] Build contact page
 - [ ] Add newsletter signup to all pages
 - [ ] Verify responsive design at 375px, 768px, 1440px breakpoints
-- [ ] Create shared site layout with functional header/footer
+- [x] Create shared site layout with functional header/footer
 
 ### Newsletter System
 - [ ] Create newsletter subscription management UI
@@ -47,23 +47,23 @@
 ## Phase 2: Core Journey (Weeks 7-12)
 
 ### Conversational Onboarding
-- [ ] Build substance selection flow (alcohol, nicotine, marijuana, codeine, prescription)
-- [ ] Build 21-dimension assessment with conversational UI
-- [ ] Implement progress indicator through assessment
+- [x] Build substance selection flow (alcohol, nicotine, marijuana, codeine, prescription)
+- [x] Build 21-dimension assessment with conversational UI
+- [x] Implement progress indicator through assessment
 - [ ] Create profile setup (name, timezone, faith preference)
 - [ ] Add skip/back navigation
-- [ ] Implement assessment response storage
-- [ ] Create initial dimension scoring from assessment
+- [x] Implement assessment response storage
+- [x] Create initial dimension scoring from assessment
 
 ### App Dashboard
-- [ ] Build dashboard layout with sidebar navigation
-- [ ] Display whole-life progress across 21 dimensions
-- [ ] Add sober-day streak counter
+- [x] Build dashboard layout with sidebar navigation
+- [x] Display whole-life progress across 21 dimensions
+- [x] Add sober-day streak counter
 - [ ] Add mood trend visualization
 - [ ] Add today's check-in prompt
 - [ ] Add upcoming goals preview
-- [ ] Implement skeleton loading states
-- [ ] Implement empty states
+- [x] Implement skeleton loading states
+- [x] Implement empty states
 - [ ] Add quick-exit affordance for privacy
 
 ### Daily Check-ins
@@ -71,12 +71,12 @@
 - [ ] Build evening check-in form
 - [ ] Implement streak tracking and milestone celebrations
 - [ ] Add optimistic updates for check-in submission
-- [ ] Create check-in history view
+- [x] Create check-in history view
 - [ ] Add check-in time preferences
 
 ### Progress Tracker
-- [ ] Build dimension score visualization
-- [ ] Create dimension score history charts
+- [x] Build dimension score visualization
+- [x] Create dimension score history charts
 - [ ] Implement phase progression display
 - [ ] Add responsive charts at all breakpoints
 - [ ] Create dimension detail view with scoring explanation
@@ -151,10 +151,10 @@
 ## Phase 4: Community & Scale (Weeks 19-24)
 
 ### Supporter Features
-- [ ] Build supporter link creation and management
-- [ ] Implement consent-scoped access
+- [x] Build supporter link creation and management
+- [x] Implement consent-scoped access
 - [ ] Create supporter dashboard
-- [ ] Add supporter access logging
+- [x] Add supporter access logging
 - [ ] Build supporter messaging (future)
 
 ### Community Features
@@ -194,8 +194,8 @@
 - [ ] Create typography scale
 - [ ] Define spacing and radius scales
 - [ ] Create component library with shadcn/ui
-- [ ] Implement dark/light theme support
-- [ ] Add animation guidelines
+- [x] Implement dark/light theme support
+- [x] Add animation guidelines
 
 ### Responsive Design
 - [ ] Verify 375px mobile layout
