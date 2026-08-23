@@ -149,6 +149,34 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
 /**
+ * External provider identities mapped to an existing ReForge user.
+ * This preserves the original Manus openId while allowing staged Supabase Auth.
+ */
+export const authIdentities = pgTable(
+  "auth_identities",
+  {
+    id: id(),
+    userId: integer("userId").notNull(),
+    provider: varchar("provider", { length: 32 }).notNull(),
+    subject: varchar("subject", { length: 128 }).notNull(),
+    createdAt: createdAt(),
+  },
+  table => ({
+    providerSubjectUnique: uniqueIndex("auth_identities_provider_subject_unique").on(
+      table.provider,
+      table.subject,
+    ),
+    userProviderUnique: uniqueIndex("auth_identities_user_provider_unique").on(
+      table.userId,
+      table.provider,
+    ),
+    userIdIdx: index("auth_identities_userId_idx").on(table.userId),
+  }),
+);
+
+export type AuthIdentity = typeof authIdentities.$inferSelect;
+
+/**
  * User roles table for RBAC.
  * Separate from profiles to support multiple roles per user.
  */

@@ -290,3 +290,14 @@
 - [x] Ensure Supabase bearer verification runs before Manus bearer verification when no Manus cookie is present
 - [x] Add a staging-only Supabase PKCE callback route with safe next-path handling and session completion signaling
 - [x] Add deterministic regression coverage for the disabled Supabase adapter and malformed bearer handling
+- [x] Add a verified-email identity bridge for staged Supabase sign-in with collision-safe ownership preservation
+- [x] Add integration coverage proving Supabase-authenticated requests resolve to existing ReForge users and preserve RBAC across protected/admin/supporter procedures
+- [x] Add Supabase-authenticated tests or staged manual verification for encrypted journal/check-in access and supporter consent-scoped data flows
+- [ ] Complete a real staged Supabase sign-in/callback verification after provider setup and document the results before marking compatibility validated
+- [x] Add deterministic Supabase request-context coverage for bearer resolution, Manus-cookie precedence, and application RBAC role loading
+- [x] Add an integration test that starts from a Supabase bearer request and resolves through the identity-mapping path to an existing ReForge user row
+- [x] Add plain protected-procedure coverage for a non-admin/non-supporter Supabase-authenticated user
+- [x] Add Supabase-authenticated coverage for encrypted check-in access paths or document a real staged manual verification covering check-ins
+- [x] Add a Supabase-authenticated integration test that exercises the real check-in helper with an encrypted notes payload and proves decrypted notes are returned for the authenticated owner
+- [x] Add a Supabase-authenticated protected checkIn.history integration test that uses the real listCheckIns decryption path
+- [x] Assert the protected check-in query receives the authenticated owner ID and returns no decrypted notes for a different user context

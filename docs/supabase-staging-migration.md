@@ -32,3 +32,7 @@ Rollback is a configuration change: set `SUPABASE_AUTH_ENABLED=false` and `VITE_
 ## Current status
 
 The Supabase project values are stored through the project secret manager. The JWKS endpoint smoke test passes, TypeScript passes, the focused Auth/security tests pass, and the production build passes. Google provider setup and a real authenticated staging callback remain user-side prerequisites; the Supabase feature flags must remain disabled until they are completed.
+
+## Identity continuity
+
+Supabase subjects are stored in `auth_identities` and mapped to the existing ReForge `users.id`. Verified Supabase email claims may create a mapping to an existing account, but the original Manus `openId` is never overwritten. This preserves future Manus login continuity, existing RBAC roles, supporter relationships, and ownership of encrypted records. The provider-plus-subject and user-plus-provider unique keys reject duplicate or ambiguous mappings.

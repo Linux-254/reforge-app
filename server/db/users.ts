@@ -1,5 +1,5 @@
 import { eq, and, inArray } from "drizzle-orm";
-import { users, userRoles, InsertUser } from "../../drizzle/schema";
+import { authIdentities, users, userRoles, InsertUser } from "../../drizzle/schema";
 import { ENV } from "../_core/env";
 import { getDb } from "./client";
 
@@ -74,6 +74,43 @@ export async function getUserByOpenId(openId: string) {
     .select()
     .from(users)
     .where(eq(users.openId, openId))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByAuthIdentity(provider: string, subject: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select({ user: users })
+    .from(authIdentities)
+    .innerJoin(users, eq(authIdentities.userId, users.id))
+    .where(and(eq(authIdentities.provider, provider), eq(authIdentities.subject, subject)))
+    .limit(1);
+  return result.length > 0 ? result[0].user : undefined;
+}
+
+export async function createAuthIdentity(userId: number, provider: string, subject: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  await db
+    .insert(authIdentities)
+    .values({ userId, provider, subject })
+    .onConflictDoNothing();
+  const result = await db
+    .select()
+    .from(authIdentities)
+    .where(and(eq(authIdentities.provider, provider), eq(authIdentities.subject, subject)))
     .limit(1);
   return result.length > 0 ? result[0] : undefined;
 }

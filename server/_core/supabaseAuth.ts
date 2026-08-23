@@ -1,7 +1,14 @@
 import { createRemoteJWKSet, jwtVerify } from "jose";
 import type { Request } from "express";
 import type { User } from "../../drizzle/schema";
-import { getUserByOpenId, upsertUser } from "../db/users";
+import {
+  createAuthIdentity,
+  getUserByAuthIdentity,
+  getUserByEmail,
+  getUserByOpenId,
+  upsertUser,
+} from "../db/users";
+import { decideSupabaseIdentityBridge } from "./identityBridge";
 import { ENV } from "./env";
 
 let remoteJwks: ReturnType<typeof createRemoteJWKSet> | null = null;
@@ -46,7 +53,31 @@ export async function authenticateSupabaseRequest(req: Request): Promise<User | 
     const name = typeof nameFromMetadata === "string" ? nameFromMetadata : null;
     const email = typeof payload.email === "string" ? payload.email : null;
 
-    let user = await getUserByOpenId(payload.sub);
+    let user = await getUserByAuthIdentity("supabase", payload.sub);
+    if (!user) user = await getUserByOpenId(payload.sub);
+    let preserveExistingApplicationUser = Boolean(user);
+
+    const existingByEmail = !user && email ? await getUserByEmail(email) : undefined;
+    const bridgeDecision = decideSupabaseIdentityBridge({
+      mappedUser: user,
+      existingByEmail,
+      emailVerified: payload.email_verified === true,
+    });
+
+    if (bridgeDecision.kind === "reject") return null;
+    if (bridgeDecision.kind === "use-existing" || bridgeDecision.kind === "bridge") {
+      user = bridgeDecision.user;
+      if (bridgeDecision.kind === "bridge") {
+        preserveExistingApplicationUser = true;
+        try {
+          await createAuthIdentity(user.id, "supabase", payload.sub);
+        } catch (error) {
+          console.warn("[Supabase Auth] Identity bridge rejected", error);
+          return null;
+        }
+      }
+    }
+
     if (!user) {
       await upsertUser({
         openId: payload.sub,
@@ -55,11 +86,12 @@ export async function authenticateSupabaseRequest(req: Request): Promise<User | 
         loginMethod: "supabase",
       });
       user = await getUserByOpenId(payload.sub);
+      if (user) await createAuthIdentity(user.id, "supabase", payload.sub);
     }
 
     if (!user) return null;
 
-    if (user.name !== name || user.email !== email || user.loginMethod !== "supabase") {
+    if (!preserveExistingApplicationUser && (user.name !== name || user.email !== email || user.loginMethod !== "supabase")) {
       await upsertUser({
         openId: payload.sub,
         name: name ?? user.name,
