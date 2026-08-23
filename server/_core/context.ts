@@ -3,6 +3,7 @@ import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
 import { getUserRoles } from "../db/users";
 import { authenticateSupabaseRequest } from "./supabaseAuth";
+import { COOKIE_NAME } from "../../shared/const";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -18,9 +19,17 @@ export async function createContext(
   let userRoles: string[] = [];
 
   try {
-    user = await sdk.authenticateRequest(opts.req);
-    if (!user) {
+    const hasManusSessionCookie =
+      typeof opts.req.headers.cookie === "string" &&
+      opts.req.headers.cookie.split(";").some(cookie => cookie.trim().startsWith(`${COOKIE_NAME}=`));
+
+    // A Supabase bearer token must be checked before Manus bearer verification;
+    // otherwise the Manus SDK throws on the token and prevents the fallback.
+    if (!hasManusSessionCookie) {
       user = await authenticateSupabaseRequest(opts.req);
+    }
+    if (!user) {
+      user = await sdk.authenticateRequest(opts.req);
     }
     if (user) {
       userRoles = await getUserRoles(user.id).catch(() => []);

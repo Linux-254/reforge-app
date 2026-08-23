@@ -287,3 +287,4 @@
 - [x] Add a disabled-by-default Supabase Auth adapter and feature flag alongside Manus Auth
 - [x] Add staging Supabase browser client configuration without exposing server-only credentials
 - [x] Add Supabase JWT claim verification and application-user resolution behind the staging flag
+- [x] Ensure Supabase bearer verification runs before Manus bearer verification when no Manus cookie is present
