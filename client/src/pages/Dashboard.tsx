@@ -23,6 +23,7 @@ import {
   TrendingUp,
 } from "lucide-react";
 import { useLocation } from "wouter";
+import { getMoodTrendState } from "@/lib/moodTrend";
 
 const quickLinks = [
   { label: "Check in", description: "Name what is here today.", path: "/check-ins", icon: HeartPulse, tone: "bg-primary/10 text-primary" },
@@ -37,8 +38,11 @@ export default function Dashboard() {
   const { user } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/" });
   const [, setLocation] = useLocation();
   const dashboardQuery = trpc.dashboard.getOverview.useQuery();
+  const moodHistoryQuery = trpc.checkIn.history.useQuery({ limit: 7 });
   const onboardingStatusQuery = trpc.onboarding.status.useQuery(undefined, { retry: false });
   const { data: overview, isLoading, isError } = dashboardQuery;
+  const moodPoints = [...(moodHistoryQuery.data ?? [])].filter(entry => entry.mood != null).slice(0, 7).reverse();
+  const moodTrendState = getMoodTrendState({ isLoading: moodHistoryQuery.isLoading, isError: moodHistoryQuery.isError, moodCount: moodPoints.length });
   const needsOnboarding = onboardingStatusQuery.data?.needsOnboarding;
   const displayName = overview?.profile?.displayName || user?.name?.split(" ")[0] || "friend";
   const currentStreak = overview?.streak?.current || 0;
@@ -105,6 +109,14 @@ export default function Dashboard() {
         )}
 
         <section className="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+          <Card className="nature-card lg:col-span-2">
+            <CardHeader><div className="flex items-center justify-between gap-4"><div><CardTitle className="font-serif text-2xl">Your recent mood</CardTitle><CardDescription>A small pattern, not a verdict. Check-ins stay private to you.</CardDescription></div><Badge variant="secondary" className="rounded-full">Last 7 check-ins</Badge></div></CardHeader>
+            <CardContent>
+              {moodTrendState === "loading" ? <div className="h-24 animate-pulse rounded-2xl bg-muted/50" aria-label="Loading mood trend" /> : moodTrendState === "error" ? <div className="flex items-center justify-between gap-4 rounded-2xl border border-destructive/25 bg-destructive/5 p-4 text-sm"><span className="text-destructive">Mood history is taking a pause. Your saved check-ins are unchanged.</span><Button variant="outline" size="sm" onClick={() => void moodHistoryQuery.refetch()} className="shrink-0 rounded-full">Try again</Button></div> : moodTrendState === "ready" ? <div className="grid grid-cols-7 items-end gap-2" role="img" aria-label={`Mood trend from ${moodPoints.length} recent check-ins`}>
+                {moodPoints.map((entry, index) => { const mood = entry.mood ?? 0; return <div key={`${entry.id}-${index}`} className="flex min-w-0 flex-col items-center gap-2"><div className="flex h-24 w-full items-end rounded-xl bg-primary/8 p-1"><div className="w-full rounded-lg bg-primary transition-[height] duration-200" style={{ height: `${Math.max(10, mood * 10)}%` }} title={`Mood ${mood} out of 10`} /></div><span className="text-[10px] text-muted-foreground">{new Date(entry.createdAt).toLocaleDateString(undefined, { weekday: "short" })}</span><span className="text-xs font-semibold text-primary">{mood}/10</span></div>; })}
+              </div> : <p className="rounded-2xl border border-dashed border-border/70 p-5 text-sm text-muted-foreground">Complete a check-in to begin noticing your mood rhythm.</p>}
+            </CardContent>
+          </Card>
           <Card className="nature-card overflow-hidden">
             <CardHeader><div className="flex items-center justify-between gap-4"><div><CardTitle className="font-serif text-2xl">Today’s check-in</CardTitle><CardDescription>Two small pauses can change the shape of a day.</CardDescription></div><Badge variant="secondary" className="rounded-full">Private</Badge></div></CardHeader>
             <CardContent className="grid gap-3 sm:grid-cols-2">

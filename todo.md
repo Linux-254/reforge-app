@@ -59,7 +59,7 @@
 - [x] Build dashboard layout with sidebar navigation
 - [x] Display whole-life progress across 21 dimensions
 - [x] Add sober-day streak counter
-- [ ] Add mood trend visualization
+- [x] Add mood trend visualization
 - [ ] Add today's check-in prompt
 - [ ] Add upcoming goals preview
 - [x] Implement skeleton loading states
@@ -267,3 +267,4 @@
 - [x] Add dedicated restorative sign-in route with accessible OAuth entry and home escape link
 - [x] Promote verified ReForge changes through GitHub branches features -> dev -> staging -> main
 - [x] Add a discreet quick-exit affordance to the authenticated shell with keyboard-accessible navigation away from private screens
+- [x] Add an accessible dashboard mood trend visualization backed by recent check-in history
