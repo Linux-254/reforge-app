@@ -271,3 +271,4 @@
 - [x] Add an explicit empty state to the dashboard goals preview
 - [x] Replace misleading hardcoded goal progress with real progress or a clearly non-progress presentation
 - [x] Surface upcoming-goal information with an honest next-step or horizon summary
+- [x] Replace the goals workspace hardcoded progress bar with real step completion data
