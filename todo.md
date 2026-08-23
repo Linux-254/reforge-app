@@ -289,3 +289,4 @@
 - [x] Add Supabase JWT claim verification and application-user resolution behind the staging flag
 - [x] Ensure Supabase bearer verification runs before Manus bearer verification when no Manus cookie is present
 - [x] Add a staging-only Supabase PKCE callback route with safe next-path handling and session completion signaling
+- [x] Add deterministic regression coverage for the disabled Supabase adapter and malformed bearer handling
