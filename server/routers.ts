@@ -706,8 +706,8 @@ export const appRouter = router({
     update: protectedProcedure
       .input(
         z.object({
-          morningCheckInTime: z.string().optional(),
-          eveningCheckInTime: z.string().optional(),
+          morningCheckInTime: z.string().regex(/^(?:[01]\\d|2[0-3]):[0-5]\\d$/, "Use 24-hour HH:MM time").optional(),
+          eveningCheckInTime: z.string().regex(/^(?:[01]\\d|2[0-3]):[0-5]\\d$/, "Use 24-hour HH:MM time").optional(),
           notificationsEnabled: z.boolean().optional(),
           emailNotifications: z.boolean().optional(),
           musicConsent: z.boolean().optional(),

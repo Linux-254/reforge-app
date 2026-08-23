@@ -67,12 +67,12 @@
 - [x] Add quick-exit affordance for privacy
 
 ### Daily Check-ins
-- [ ] Build morning check-in form (mood, energy, cravings)
-- [ ] Build evening check-in form
-- [ ] Implement streak tracking and milestone celebrations
-- [ ] Add optimistic updates for check-in submission
+- [x] Build morning check-in form (mood, energy, cravings)
+- [x] Build evening check-in form
+- [x] Implement streak tracking and milestone celebrations
+- [x] Add optimistic updates for check-in submission
 - [x] Create check-in history view
-- [ ] Add check-in time preferences
+- [x] Add check-in time preferences
 
 ### Progress Tracker
 - [x] Build dimension score visualization
@@ -303,3 +303,7 @@
 - [x] Assert the protected check-in query receives the authenticated owner ID and returns no decrypted notes for a different user context
 - [x] Add profile setup controls for name, timezone, and faith preference with persisted values
 - [x] Add keyboard-accessible skip and back navigation to the onboarding assessment flow
+- [x] Make the active Today route open a functional morning/evening check-in form and provide a discoverable history route
+- [x] Restyle the daily check-in form with the ReForge nature-led shell, accessible feedback, and retry-safe submission states
+- [x] Wire the active /settings route to the settings screen that exposes morning/evening check-in time controls
+- [x] Verify the active /settings route exposes persisted morning/evening schedule fields and valid HH:MM validation

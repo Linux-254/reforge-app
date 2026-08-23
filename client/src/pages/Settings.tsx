@@ -18,6 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import {
   ArrowRight,
   Bell,
+  Clock3,
   LockKeyhole,
   Mail,
   Palette,
@@ -48,6 +49,8 @@ export default function Settings() {
   const [displayName, setDisplayName] = useState<string>();
   const [timezone, setTimezone] = useState<string>();
   const [faithPreference, setFaithPreference] = useState<"faith" | "secular" | "both">();
+  const [morningCheckInTime, setMorningCheckInTime] = useState<string>();
+  const [eveningCheckInTime, setEveningCheckInTime] = useState<string>();
   const isAdmin = rolesQuery.data?.includes("admin") ?? false;
   const busy = profileQuery.isLoading || preferencesQuery.isLoading;
 
@@ -66,6 +69,15 @@ export default function Settings() {
   ) => {
     await preferencesMutation.mutateAsync({ [key]: value });
     await preferencesQuery.refetch();
+  };
+
+  const saveCheckInTimes = async () => {
+    await preferencesMutation.mutateAsync({
+      morningCheckInTime: morningCheckInTime ?? preferences?.morningCheckInTime ?? "08:00",
+      eveningCheckInTime: eveningCheckInTime ?? preferences?.eveningCheckInTime ?? "20:00",
+    });
+    await preferencesQuery.refetch();
+    toast.success("Your check-in rhythm has been saved.");
   };
 
   if (busy) {
@@ -115,6 +127,15 @@ export default function Settings() {
               <div className="flex items-center justify-between gap-4"><div><p className="text-sm font-medium">In-app reminders</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Prompts for morning and evening check-ins.</p></div><Switch checked={preferences?.notificationsEnabled ?? true} onCheckedChange={(value) => updatePreference("notificationsEnabled", value)} /></div>
               <div className="flex items-center justify-between gap-4"><div><p className="text-sm font-medium">Email notes</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Newsletter and milestone messages you choose.</p></div><Switch checked={preferences?.emailNotifications ?? true} onCheckedChange={(value) => updatePreference("emailNotifications", value)} /></div>
               <div className="flex items-center justify-between gap-4"><div><p className="text-sm font-medium">Music practice</p><p className="mt-1 text-xs leading-5 text-muted-foreground">Let music-based prompts appear in your space.</p></div><Switch checked={preferences?.musicConsent ?? false} onCheckedChange={(value) => updatePreference("musicConsent", value)} /></div>
+              <div className="border-t border-border/60 pt-5">
+                <div className="mb-3 flex items-center gap-2"><Clock3 className="h-4 w-4 text-primary" /><p className="text-sm font-medium">Check-in rhythm</p></div>
+                <p className="mb-4 text-xs leading-5 text-muted-foreground">Pick gentle local-time anchors. You can change these whenever your days change.</p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2"><Label htmlFor="morning-check-in-time">Morning</Label><Input id="morning-check-in-time" type="time" value={morningCheckInTime ?? preferences?.morningCheckInTime ?? "08:00"} onChange={(event) => setMorningCheckInTime(event.target.value)} className="rounded-xl bg-background/60" /></div>
+                  <div className="space-y-2"><Label htmlFor="evening-check-in-time">Evening</Label><Input id="evening-check-in-time" type="time" value={eveningCheckInTime ?? preferences?.eveningCheckInTime ?? "20:00"} onChange={(event) => setEveningCheckInTime(event.target.value)} className="rounded-xl bg-background/60" /></div>
+                </div>
+                <Button variant="outline" onClick={saveCheckInTimes} disabled={preferencesMutation.isPending} className="mt-4 rounded-full">{preferencesMutation.isPending ? "Saving…" : "Save check-in times"}</Button>
+              </div>
             </CardContent>
           </Card>
         </div>

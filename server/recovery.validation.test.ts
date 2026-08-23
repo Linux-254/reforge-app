@@ -48,6 +48,11 @@ describe("check-in validation", () => {
     await expect(caller.checkIn.create({ part: "morning", mood: 11 })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
+  it("rejects malformed check-in schedule times", async () => {
+    const caller = appRouter.createCaller(createContext());
+    await expect(caller.preferences.update({ morningCheckInTime: "25:90" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
   it("rejects empty journal entries", async () => {
     const caller = appRouter.createCaller(createContext());
     await expect(caller.journal.create({ body: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });

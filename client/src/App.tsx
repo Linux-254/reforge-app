@@ -15,11 +15,13 @@ import SupabaseCallback from "@/pages/site/SupabaseCallback";
 import Privacy from "@/pages/site/Privacy";
 import Terms from "@/pages/site/Terms";
 import Dashboard from "@/pages/Dashboard";
+import CheckIn from "@/pages/CheckIn";
 import CheckInHistory from "@/pages/CheckInHistory";
 import Devotional from "@/pages/Devotional";
 import Admin from "@/pages/Admin";
 import { RulesPage, NewsletterPage } from "@/pages/AdditionalFeatures";
-import { GoalsPage, GuidesPage, JournalPage, MusicPage, ProgressPage, SettingsPage } from "@/pages/RecoveryWorkspace";
+import { GoalsPage, GuidesPage, JournalPage, MusicPage, ProgressPage } from "@/pages/RecoveryWorkspace";
+import Settings from "@/pages/Settings";
 import OnboardingPage from "@/pages/Onboarding";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -44,7 +46,8 @@ function Router() {
       <Route path={"/terms"} component={Terms} />
       <Route path={"/dashboard"} component={Dashboard} />
       <Route path={"/progress"} component={ProgressPage} />
-      <Route path={"/check-ins"} component={CheckInHistory} />
+      <Route path={"/check-ins"} component={CheckIn} />
+      <Route path={"/check-in-history"} component={CheckInHistory} />
       <Route path={"/journal"} component={JournalPage} />
       <Route path={"/rules"} component={RulesPage} />
       <Route path={"/goals"} component={GoalsPage} />
@@ -52,7 +55,7 @@ function Router() {
       <Route path={"/music"} component={MusicPage} />
       <Route path={"/devotional"} component={Devotional} />
       <Route path={"/newsletter"} component={NewsletterPage} />
-      <Route path={"/settings"} component={SettingsPage} />
+      <Route path={"/settings"} component={Settings} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/onboarding"} component={OnboardingPage} />
       <Route path={"/404"} component={NotFound} />
