@@ -50,8 +50,8 @@
 - [x] Build substance selection flow (alcohol, nicotine, marijuana, codeine, prescription)
 - [x] Build 21-dimension assessment with conversational UI
 - [x] Implement progress indicator through assessment
-- [ ] Create profile setup (name, timezone, faith preference)
-- [ ] Add skip/back navigation
+- [x] Create profile setup (name, timezone, faith preference)
+- [x] Add skip/back navigation
 - [x] Implement assessment response storage
 - [x] Create initial dimension scoring from assessment
 
@@ -301,3 +301,5 @@
 - [x] Add a Supabase-authenticated integration test that exercises the real check-in helper with an encrypted notes payload and proves decrypted notes are returned for the authenticated owner
 - [x] Add a Supabase-authenticated protected checkIn.history integration test that uses the real listCheckIns decryption path
 - [x] Assert the protected check-in query receives the authenticated owner ID and returns no decrypted notes for a different user context
+- [x] Add profile setup controls for name, timezone, and faith preference with persisted values
+- [x] Add keyboard-accessible skip and back navigation to the onboarding assessment flow

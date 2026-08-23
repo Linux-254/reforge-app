@@ -14,7 +14,7 @@ import {
   HeartHandshake,
 } from "lucide-react";
 import { useLocation } from "wouter";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 type Step =
@@ -49,6 +49,7 @@ export default function Onboarding() {
   const saveScoreMutation = trpc.onboarding.saveScore.useMutation();
   const completeMutation = trpc.onboarding.completeAssessment.useMutation();
   const updateProfileMutation = trpc.profile.update.useMutation();
+  const profileQuery = trpc.profile.get.useQuery(undefined, { retry: false });
 
   const dimsById = useMemo(
     () => new Map((dimsQuery.data ?? []).map(d => [d.id, d])),
@@ -83,10 +84,21 @@ export default function Onboarding() {
   const [faithPreference, setFaithPreference] = useState<
     "faith" | "secular" | "both"
   >("both");
+  const [timezone, setTimezone] = useState(() =>
+    Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC"
+  );
   const [answers, setAnswers] = useState<
     Record<string, { answer: string; rating: number }>
   >({});
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    const profile = profileQuery.data;
+    if (!profile) return;
+    setDisplayName(current => current || profile.displayName || "");
+    setTimezone(current => current || profile.timezone || "UTC");
+    setFaithPreference(profile.faithPreference || "both");
+  }, [profileQuery.data]);
 
   const step = steps[stepIndex];
   const total = steps.length;
@@ -126,7 +138,8 @@ export default function Onboarding() {
       try {
         const id = await startAssessmentIfNeeded();
         await updateProfileMutation.mutateAsync({
-          displayName: displayName || undefined,
+          displayName: displayName.trim() || undefined,
+          timezone: timezone.trim() || "UTC",
           faithPreference,
         });
         await completeMutation.mutateAsync({
@@ -150,6 +163,11 @@ export default function Onboarding() {
   };
 
   const back = () => setStepIndex(i => Math.max(i - 1, 0));
+
+  const skipCurrent = async () => {
+    if (!isDimensionStep) return;
+    await advance();
+  };
 
   const handleSaveCurrent = async (): Promise<boolean> => {
     if (step?.kind !== "dimension") return true;
@@ -181,6 +199,21 @@ export default function Onboarding() {
   };
 
   const next = async () => {
+    if (step?.kind === "profile") {
+      setBusy(true);
+      try {
+        await updateProfileMutation.mutateAsync({
+          displayName: displayName.trim() || undefined,
+          timezone: timezone.trim() || "UTC",
+          faithPreference,
+        });
+      } catch {
+        toast.error("Couldn't save your profile yet. Please try again.");
+        setBusy(false);
+        return;
+      }
+      setBusy(false);
+    }
     if (isDimensionStep) {
       const ok = await handleSaveCurrent();
       if (!ok) return;
@@ -310,6 +343,21 @@ export default function Onboarding() {
                 onChange={e => setDisplayName(e.target.value)}
                 placeholder={user?.name || "Your name"}
               />
+            </div>
+            <div>
+              <label htmlFor="profile-timezone" className="block text-sm font-medium text-stone-700 mb-2">
+                Your timezone
+              </label>
+              <Input
+                id="profile-timezone"
+                value={timezone}
+                onChange={e => setTimezone(e.target.value)}
+                placeholder="Africa/Nairobi"
+                aria-describedby="profile-timezone-help"
+              />
+              <p id="profile-timezone-help" className="mt-1 text-xs text-stone-500">
+                Used only to place check-ins and reminders in your local day.
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-2">
@@ -448,7 +496,18 @@ export default function Onboarding() {
           {renderStep()}
         </div>
 
-        <div className="flex items-center justify-between gap-4 pb-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 pb-8">
+          {isDimensionStep && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => void skipCurrent()}
+              disabled={busy}
+              className="rounded-full"
+            >
+              Skip for now
+            </Button>
+          )}
           <Button
             variant="ghost"
             onClick={back}
