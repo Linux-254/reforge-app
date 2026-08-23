@@ -34,7 +34,7 @@
 - [x] Build for-supporters page
 - [x] Build contact page
 - [ ] Add newsletter signup to all pages
-- [ ] Verify responsive design at 375px, 768px, 1440px breakpoints
+- [x] Verify responsive design at 375px, 768px, 1440px breakpoints
 - [x] Create shared site layout with functional header/footer
 
 ### Newsletter System
@@ -198,9 +198,9 @@
 - [x] Add animation guidelines
 
 ### Responsive Design
-- [ ] Verify 375px mobile layout
-- [ ] Verify 768px tablet layout
-- [ ] Verify 1440px desktop layout
+- [x] Verify 375px mobile layout
+- [x] Verify 768px tablet layout
+- [x] Verify 1440px desktop layout
 - [ ] Test touch targets (≥44px)
 - [ ] Test keyboard navigation
 - [ ] Test screen reader compatibility
@@ -272,3 +272,13 @@
 - [x] Replace misleading hardcoded goal progress with real progress or a clearly non-progress presentation
 - [x] Surface upcoming-goal information with an honest next-step or horizon summary
 - [x] Replace the goals workspace hardcoded progress bar with real step completion data
+- [ ] Verify all public marketing pages at 375px, 768px, and 1440px and document route findings
+- [ ] Verify protected routes at 375px, 768px, and 1440px and document route findings
+
+## Supabase Auth migration preparation
+
+- [ ] Create a private GitHub repository for ReForge and push the current verified checkpoint as the baseline
+- [ ] Inspect Supabase connector/project availability and capture required setup values
+- [ ] Prepare a staging-only Supabase Auth migration plan without changing production authentication
+- [ ] Validate Supabase Auth compatibility with existing Drizzle schema, RBAC, encryption, and supporter consent flows
+- [ ] Document Supabase setup, redirect URLs, migration risks, and rollback steps
