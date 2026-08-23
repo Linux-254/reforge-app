@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
 import { REFORGE_ASSETS } from "@/config/assets";
 import { trpc } from "@/lib/trpc";
+import { filterJournalEntries, parseJournalDimensionFilter } from "@/lib/journalFilters";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,7 +11,8 @@ import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { ArrowLeft, ArrowRight, BookOpen, Check, Headphones, Heart, Lock, Music2, Plus, Save, ShieldCheck, Sparkles, Target, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
+import { ArrowLeft, ArrowRight, BookOpen, Check, Headphones, Heart, Lock, Music2, Pencil, Plus, Save, Search, ShieldCheck, Sparkles, Target, Trash2, TrendingUp, X } from "lucide-react";
 
 function Workspace({ children }: { children: React.ReactNode }) {
   return <DashboardLayout>{children}</DashboardLayout>;
@@ -39,10 +41,85 @@ const journalPrompts = [
 export function JournalPage() {
   const [body, setBody] = useState("");
   const [activePrompt, setActivePrompt] = useState<string>();
-  const listQuery = trpc.journal.list.useQuery({ limit: 20, offset: 0 });
-  const createMutation = trpc.journal.create.useMutation({ onSuccess: () => { setBody(""); setActivePrompt(undefined); void listQuery.refetch(); } });
-  const selectPrompt = (prompt: typeof journalPrompts[number]) => { setActivePrompt(prompt.label); setBody((current) => current ? `${current}\n\n${prompt.text} ` : `${prompt.text} `); };
-  return <Workspace><div className="mx-auto max-w-5xl space-y-7"><section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-[#304333] text-[#f7eddc]"><img src={REFORGE_ASSETS.journal} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" /><div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(39,58,43,.96),rgba(39,58,43,.54),rgba(39,58,43,.14))]" /><div className="relative grid gap-8 p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end"><div className="max-w-xl space-y-3"><p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200"><BookOpen className="h-4 w-4" /> Private reflection</p><h1 className="font-serif text-4xl leading-tight sm:text-5xl">Make room for the truth.</h1><p className="text-sm leading-7 text-white/75 sm:text-base">Your journal is not a performance. It is a private place to notice what you have been carrying, learning, and choosing.</p></div><div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/10 px-4 py-3 text-xs text-white/75"><Lock className="h-4 w-4 text-amber-200" /> Encrypted before storage</div></div></section><div className="grid gap-6 lg:grid-cols-[.88fr_1.12fr] lg:items-start"><Card className="rounded-2xl border-border/70 bg-card/85 shadow-none"><CardHeader><CardTitle className="font-serif text-2xl">Choose a doorway in</CardTitle><CardDescription>Use a prompt if it helps. Or begin anywhere.</CardDescription></CardHeader><CardContent className="space-y-4"><div className="flex flex-wrap gap-2">{journalPrompts.map((prompt) => <Button key={prompt.label} type="button" variant={activePrompt === prompt.label ? "default" : "outline"} onClick={() => selectPrompt(prompt)} className="rounded-full text-xs">{prompt.label}</Button>)}</div><Textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="What feels important today?" className="min-h-56 resize-y rounded-2xl bg-background/70" /><div className="flex items-center gap-2 text-xs leading-5 text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5 shrink-0 text-primary" /> Your entry is private to you and sensitive text is encrypted before it is stored.</div>{createMutation.error && <p className="rounded-xl border border-destructive/30 bg-destructive/8 p-3 text-sm text-destructive">We could not save this reflection. Please try again.</p>}<Button disabled={!body.trim() || createMutation.isPending} onClick={() => createMutation.mutate({ body: body.trim() })} className="w-full rounded-full gap-2"><Save className="h-4 w-4" />{createMutation.isPending ? "Saving your page…" : "Save reflection"}</Button></CardContent></Card><Card className="rounded-2xl border-border/70 bg-card/80 shadow-none"><CardHeader><CardTitle className="font-serif text-2xl">Recent reflections</CardTitle><CardDescription>A gentle record of what you have been carrying and learning.</CardDescription></CardHeader><CardContent className="space-y-3">{listQuery.isLoading ? <div className="space-y-3">{[1, 2, 3].map((item) => <div key={item} className="h-24 animate-pulse rounded-2xl bg-muted/50" />)}</div> : listQuery.isError ? <p className="text-sm text-destructive">We could not load your private reflections right now.</p> : listQuery.data?.length ? listQuery.data.map((entry) => <article key={entry.id} className="rounded-2xl border border-border/50 bg-muted/30 p-4"><p className="whitespace-pre-wrap text-sm leading-6">{entry.body}</p><p className="mt-3 text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</p></article>) : <EmptyState title="Your first page is waiting." description="There is no right way to begin. A few honest words are enough." icon={BookOpen} />}</CardContent></Card></div></div></Workspace>;
+  const [search, setSearch] = useState("");
+  const [editingId, setEditingId] = useState<number>();
+  const [editingBody, setEditingBody] = useState("");
+  const [deleteId, setDeleteId] = useState<number>();
+  const [dimensionFilter, setDimensionFilter] = useState("all");
+  const dimensionsQuery = trpc.onboarding.getDimensions.useQuery(undefined, { staleTime: 5 * 60 * 1000 });
+  const parsedDimensionFilter = parseJournalDimensionFilter(dimensionFilter);
+  const listInput = useMemo(() => ({
+    limit: 50,
+    offset: 0,
+    ...(parsedDimensionFilter === undefined ? {} : { dimensionId: parsedDimensionFilter }),
+  }), [parsedDimensionFilter]);
+  const listQuery = trpc.journal.list.useQuery(listInput);
+  const utils = trpc.useUtils();
+  const createMutation = trpc.journal.create.useMutation({
+    onSuccess: async () => {
+      setBody("");
+      setActivePrompt(undefined);
+      await utils.journal.list.invalidate();
+      toast.success("Your reflection is safely tucked away.");
+    },
+    onError: () => toast.error("We could not save this reflection. Your draft is still here; please try again."),
+  });
+  const updateMutation = trpc.journal.update.useMutation({
+    onSuccess: async () => {
+      setEditingId(undefined);
+      setEditingBody("");
+      await utils.journal.list.invalidate();
+      toast.success("Reflection updated.");
+    },
+    onError: () => toast.error("We could not update this reflection. Please try again."),
+  });
+  const deleteMutation = trpc.journal.remove.useMutation({
+    onSuccess: async () => {
+      setDeleteId(undefined);
+      await utils.journal.list.invalidate();
+      toast.success("Reflection deleted from your journal.");
+    },
+    onError: () => toast.error("We could not delete this reflection. Please try again."),
+  });
+  const selectPrompt = (prompt: typeof journalPrompts[number]) => {
+    setActivePrompt(prompt.label);
+    setBody((current) => current ? `${current}\n\n${prompt.text} ` : `${prompt.text} `);
+  };
+  const visibleEntries = filterJournalEntries(listQuery.data ?? [], { search });
+
+  return <Workspace>
+    <div className="mx-auto max-w-5xl space-y-7">
+      <section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-[#304333] text-[#f7eddc]">
+        <img src={REFORGE_ASSETS.journal} alt="" className="absolute inset-0 h-full w-full object-cover opacity-35" />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(39,58,43,.96),rgba(39,58,43,.54),rgba(39,58,43,.14))]" />
+        <div className="relative grid gap-8 p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div className="max-w-xl space-y-3"><p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200"><BookOpen className="h-4 w-4" aria-hidden="true" /> Private reflection</p><h1 className="font-serif text-4xl leading-tight sm:text-5xl">Make room for the truth.</h1><p className="text-sm leading-7 text-white/75 sm:text-base">Your journal is not a performance. It is a private place to notice what you have been carrying, learning, and choosing.</p></div>
+          <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/10 px-4 py-3 text-xs text-white/75"><Lock className="h-4 w-4 text-amber-200" aria-hidden="true" /> Encrypted before storage</div>
+        </div>
+      </section>
+
+      <div className="grid gap-6 lg:grid-cols-[.88fr_1.12fr] lg:items-start">
+        <Card className="rounded-2xl border-border/70 bg-card/85 shadow-none">
+          <CardHeader><CardTitle className="font-serif text-2xl">Choose a doorway in</CardTitle><CardDescription>Use a prompt if it helps. Or begin anywhere.</CardDescription></CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex flex-wrap gap-2">{journalPrompts.map((prompt) => <Button key={prompt.label} type="button" variant={activePrompt === prompt.label ? "default" : "outline"} onClick={() => selectPrompt(prompt)} className="rounded-full text-xs">{prompt.label}</Button>)}</div>
+            <Textarea value={body} onChange={(event) => setBody(event.target.value)} placeholder="What feels important today?" className="min-h-56 resize-y rounded-2xl bg-background/70" aria-label="Private journal reflection" />
+            <div className="flex items-center gap-2 text-xs leading-5 text-muted-foreground"><ShieldCheck className="h-3.5 w-3.5 shrink-0 text-primary" aria-hidden="true" /> Your entry is private to you and sensitive text is encrypted before it is stored.</div>
+            <Button disabled={!body.trim() || createMutation.isPending} onClick={() => createMutation.mutate({ body: body.trim() })} className="w-full gap-2 rounded-full"><Save className="h-4 w-4" aria-hidden="true" />{createMutation.isPending ? "Saving your page…" : "Save reflection"}</Button>
+          </CardContent>
+        </Card>
+
+        <Card className="rounded-2xl border-border/70 bg-card/80 shadow-none">
+          <CardHeader className="space-y-4"><div><CardTitle className="font-serif text-2xl">Recent reflections</CardTitle><CardDescription>A gentle record of what you have been carrying and learning.</CardDescription></div><div className="grid gap-2 sm:grid-cols-[1fr_200px]"><div className="relative"><Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" /><Input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search your reflections" className="rounded-xl pl-9" aria-label="Search private reflections" /></div><div className="space-y-1"><label htmlFor="journal-dimension-filter" className="sr-only">Filter by life dimension</label><select id="journal-dimension-filter" value={dimensionFilter} onChange={(event) => setDimensionFilter(event.target.value)} className="h-10 w-full rounded-xl border bg-background px-3 text-sm" disabled={dimensionsQuery.isLoading}><option value="all">All dimensions</option>{(dimensionsQuery.data ?? []).map((dimension) => <option key={dimension.id} value={dimension.id}>{dimension.label}</option>)}</select></div></div></CardHeader>
+          <CardContent className="space-y-3">
+            {listQuery.isLoading ? <div className="space-y-3">{[1, 2, 3].map((item) => <div key={item} className="h-24 animate-pulse rounded-2xl bg-muted/50" />)}</div> : listQuery.isError ? <div className="space-y-3"><p className="text-sm text-destructive">We could not load your private reflections right now.</p><Button variant="outline" size="sm" onClick={() => void listQuery.refetch()} className="rounded-full">Try again</Button></div> : visibleEntries.length ? visibleEntries.map((entry) => <article key={entry.id} className="rounded-2xl border border-border/50 bg-muted/30 p-4">
+              {editingId === entry.id ? <div className="space-y-3"><Textarea value={editingBody} onChange={(event) => setEditingBody(event.target.value)} className="min-h-32 rounded-xl bg-background/70" aria-label="Edit private journal reflection" /><div className="flex flex-wrap justify-end gap-2"><Button type="button" variant="ghost" size="sm" onClick={() => { setEditingId(undefined); setEditingBody(""); }} className="rounded-full"><X className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Cancel</Button><Button type="button" size="sm" disabled={!editingBody.trim() || updateMutation.isPending} onClick={() => updateMutation.mutate({ entryId: entry.id, body: editingBody.trim() })} className="rounded-full"><Save className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Save changes</Button></div></div> : <><p className="whitespace-pre-wrap text-sm leading-6">{entry.body}</p><div className="mt-3 flex flex-wrap items-center justify-between gap-3"><p className="text-xs text-muted-foreground">{new Date(entry.createdAt).toLocaleString()}</p><div className="flex items-center gap-1">{deleteId === entry.id ? <><Button type="button" variant="destructive" size="sm" disabled={deleteMutation.isPending} onClick={() => deleteMutation.mutate({ entryId: entry.id })} className="rounded-full">Delete forever</Button><Button type="button" variant="ghost" size="sm" onClick={() => setDeleteId(undefined)} className="rounded-full">Keep</Button></> : <><Button type="button" variant="ghost" size="sm" onClick={() => { setEditingId(entry.id); setEditingBody(entry.body); }} className="rounded-full"><Pencil className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Edit</Button><Button type="button" variant="ghost" size="sm" onClick={() => setDeleteId(entry.id)} className="rounded-full text-destructive hover:text-destructive"><Trash2 className="mr-1 h-3.5 w-3.5" aria-hidden="true" /> Delete</Button></>}</div></div></>}
+            </article>) : search.trim() ? <EmptyState title="No reflections found." description="Try a different word, or clear the search to see all your pages." icon={Search} /> : <EmptyState title="Your first page is waiting." description="There is no right way to begin. A few honest words are enough." icon={BookOpen} />}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  </Workspace>;
 }
 
 function GoalProgress({ goalId }: { goalId: number }) {

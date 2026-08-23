@@ -20,18 +20,32 @@ export async function createJournalEntry(
   });
 }
 
+export type JournalEntryFilters = {
+  dimensionId?: number;
+  promptId?: number;
+};
+
 export async function getJournalEntries(
   userId: number,
   limit = 20,
-  offset = 0
+  offset = 0,
+  filters: JournalEntryFilters = {}
 ) {
   const db = await getDb();
   if (!db) return [];
 
+  const conditions = [eq(journalEntries.userId, userId)];
+  if (filters.dimensionId !== undefined) {
+    conditions.push(eq(journalEntries.dimensionId, filters.dimensionId));
+  }
+  if (filters.promptId !== undefined) {
+    conditions.push(eq(journalEntries.promptId, filters.promptId));
+  }
+
   const rows = await db
     .select()
     .from(journalEntries)
-    .where(eq(journalEntries.userId, userId))
+    .where(and(...conditions))
     .orderBy(desc(journalEntries.createdAt))
     .limit(limit)
     .offset(offset);

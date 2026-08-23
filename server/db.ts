@@ -16,6 +16,7 @@ import {
   milestones,
   journalEntries,
   rulesBoundaries,
+  ruleReviews,
   goals,
   goalSteps,
   resources,
@@ -57,6 +58,32 @@ export function decryptSensitive(value: string | null): string | null {
     ]).toString("utf8");
   } catch {
     return null;
+  }
+}
+
+const ASSESSMENT_CIPHERTEXT_KEY = "ciphertext";
+
+export function encryptAssessmentPayload(payload: Record<string, unknown>) {
+  return {
+    [ASSESSMENT_CIPHERTEXT_KEY]: encryptSensitive(JSON.stringify(payload)),
+  };
+}
+
+export function decryptAssessmentPayload(payload: unknown): Record<string, unknown> {
+  if (!payload || typeof payload !== "object" || !(ASSESSMENT_CIPHERTEXT_KEY in payload)) {
+    return {};
+  }
+  const encrypted = (payload as Record<string, unknown>)[ASSESSMENT_CIPHERTEXT_KEY];
+  if (typeof encrypted !== "string") return {};
+  const decrypted = decryptSensitive(encrypted);
+  if (!decrypted) return {};
+  try {
+    const parsed: unknown = JSON.parse(decrypted);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? parsed as Record<string, unknown>
+      : {};
+  } catch {
+    return {};
   }
 }
 
@@ -287,7 +314,34 @@ export async function saveAssessmentResponse(
     .limit(1);
   if (!ownedAssessment[0]) throw new Error("Assessment not found");
 
-  await db.insert(assessmentResponses).values({ assessmentId, dimensionId, payload });
+  await db.insert(assessmentResponses).values({
+    assessmentId,
+    dimensionId,
+    payload: encryptAssessmentPayload(payload),
+  });
+}
+
+export async function getAssessmentResponses(userId: number, assessmentId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const ownedAssessment = await db
+    .select({ id: assessments.id })
+    .from(assessments)
+    .where(and(eq(assessments.id, assessmentId), eq(assessments.userId, userId)))
+    .limit(1);
+  if (!ownedAssessment[0]) throw new Error("Assessment not found");
+
+  const rows = await db
+    .select()
+    .from(assessmentResponses)
+    .where(eq(assessmentResponses.assessmentId, assessmentId))
+    .orderBy(asc(assessmentResponses.createdAt));
+
+  return rows.map((row) => ({
+    ...row,
+    payload: decryptAssessmentPayload(row.payload),
+  }));
 }
 
 export async function completeAssessment(userId: number, assessmentId: number) {
@@ -417,14 +471,32 @@ export async function createJournalEntry(
   return (result as { insertId?: number }).insertId;
 }
 
-export async function getJournalEntries(userId: number, limit = 20, offset = 0) {
+export type JournalEntryFilters = {
+  dimensionId?: number;
+  promptId?: number;
+};
+
+export async function getJournalEntries(
+  userId: number,
+  limit = 20,
+  offset = 0,
+  filters: JournalEntryFilters = {}
+) {
   const db = await getDb();
   if (!db) return [];
+
+  const conditions = [eq(journalEntries.userId, userId)];
+  if (filters.dimensionId !== undefined) {
+    conditions.push(eq(journalEntries.dimensionId, filters.dimensionId));
+  }
+  if (filters.promptId !== undefined) {
+    conditions.push(eq(journalEntries.promptId, filters.promptId));
+  }
 
   const rows = await db
     .select()
     .from(journalEntries)
-    .where(eq(journalEntries.userId, userId))
+    .where(and(...conditions))
     .orderBy(desc(journalEntries.createdAt))
     .limit(limit)
     .offset(offset);
@@ -920,16 +992,66 @@ export async function getRules(userId: number) {
   return db.select().from(rulesBoundaries).where(eq(rulesBoundaries.userId, userId));
 }
 
-export async function updateRule(userId: number, ruleId: number, data: { text?: string; isCompleted?: boolean; reviewCadence?: string }) {
+export async function updateRule(userId: number, ruleId: number, data: { text?: string; active?: boolean; reviewCadence?: "daily" | "weekly" | "monthly" }) {
   const db = await getDb();
   if (!db) return;
-  await db.update(rulesBoundaries).set({ text: data.text, active: data.isCompleted === undefined ? undefined : data.isCompleted, reviewCadence: data.reviewCadence as "daily" | "weekly" | "monthly" | undefined }).where(and(eq(rulesBoundaries.id, ruleId), eq(rulesBoundaries.userId, userId)));
+  await db.update(rulesBoundaries).set({
+    ...(data.text === undefined ? {} : { text: data.text }),
+    ...(data.active === undefined ? {} : { active: data.active }),
+    ...(data.reviewCadence === undefined ? {} : { reviewCadence: data.reviewCadence }),
+  }).where(and(eq(rulesBoundaries.id, ruleId), eq(rulesBoundaries.userId, userId)));
 }
 
 export async function deleteRule(userId: number, ruleId: number) {
   const db = await getDb();
   if (!db) return;
   await db.delete(rulesBoundaries).where(and(eq(rulesBoundaries.id, ruleId), eq(rulesBoundaries.userId, userId)));
+}
+
+export async function createRuleReview(
+  userId: number,
+  ruleId: number,
+  kept: boolean,
+  notes?: string
+) {
+  const db = await getDb();
+  if (!db) return;
+
+  const ownedRule = await db
+    .select({ id: rulesBoundaries.id })
+    .from(rulesBoundaries)
+    .where(and(eq(rulesBoundaries.id, ruleId), eq(rulesBoundaries.userId, userId)))
+    .limit(1);
+  if (!ownedRule[0]) throw new Error("Rule not found");
+
+  await db.insert(ruleReviews).values({
+    ruleId,
+    reviewDate: new Date(),
+    kept,
+    notes: notes?.trim() ? encryptSensitive(notes.trim()) : null,
+  });
+}
+
+export async function getRuleReviews(userId: number, ruleId: number) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const ownedRule = await db
+    .select({ id: rulesBoundaries.id })
+    .from(rulesBoundaries)
+    .where(and(eq(rulesBoundaries.id, ruleId), eq(rulesBoundaries.userId, userId)))
+    .limit(1);
+  if (!ownedRule[0]) throw new Error("Rule not found");
+
+  const rows = await db
+    .select()
+    .from(ruleReviews)
+    .where(eq(ruleReviews.ruleId, ruleId))
+    .orderBy(desc(ruleReviews.reviewDate));
+  return rows.map((row) => ({
+    ...row,
+    notes: decryptSensitive(row.notes),
+  }));
 }
 
 export async function getPlaylists(userId: number) {

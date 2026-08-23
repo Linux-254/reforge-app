@@ -56,6 +56,12 @@ describe("check-in validation", () => {
   it("rejects empty journal entries", async () => {
     const caller = appRouter.createCaller(createContext());
     await expect(caller.journal.create({ body: "" })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+    await expect(caller.journal.create({ body: "   " })).rejects.toMatchObject({ code: "BAD_REQUEST" });
+  });
+
+  it("rejects oversized journal entries", async () => {
+    const caller = appRouter.createCaller(createContext());
+    await expect(caller.journal.create({ body: "x".repeat(20_001) })).rejects.toMatchObject({ code: "BAD_REQUEST" });
   });
 
   it("requires at least one newsletter send type", async () => {

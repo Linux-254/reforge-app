@@ -82,15 +82,15 @@
 - [ ] Create dimension detail view with scoring explanation
 
 ### Journal Feature
-- [ ] Build journal entry creation with guided prompts
+- [x] Build journal entry creation with guided prompts
 - [ ] Implement dimension-linked journal entries
 - [ ] Add rich text editor for journal bodies
-- [ ] Create journal entry list view
-- [ ] Implement Tier-1 sensitive data encryption
-- [ ] Add journal search and filtering
+- [x] Create journal entry list view
+- [x] Implement Tier-1 sensitive data encryption
+- [x] Add journal search and filtering
 
 ### Rules & Boundaries
-- [ ] Build rules creation and editing UI
+- [x] Build rules creation and editing UI
 - [ ] Implement daily review cadence
 - [ ] Create rule review history
 - [ ] Add rule status tracking (active/inactive)
@@ -183,7 +183,7 @@
 ## Cross-cutting Concerns
 
 ### Security & Compliance
-- [ ] Implement Tier-1 sensitive data encryption (journal, assessment)
+- [x] Implement Tier-1 sensitive data encryption (journal, assessment)
 - [ ] Add log scrubbing to prevent sensitive data leakage
 - [ ] Implement break-glass audit logging for admin access
 - [ ] Set up OWASP security checklist
@@ -307,3 +307,13 @@
 - [x] Restyle the daily check-in form with the ReForge nature-led shell, accessible feedback, and retry-safe submission states
 - [x] Wire the active /settings route to the settings screen that exposes morning/evening check-in time controls
 - [x] Verify the active /settings route exposes persisted morning/evening schedule fields and valid HH:MM validation
+- [x] Build the active journal workspace with guided prompts, encrypted creation, list/search, and empty/error states
+- [x] Add regression coverage for journal creation validation, encryption boundaries, and owner-scoped retrieval
+- [x] Clarify and implement journal search scope: owner-scoped server-side dimension filters plus client-side keyword search over decrypted entries
+- [x] Encrypt assessment response payloads at rest and expose only owner-checked decrypted responses through a protected procedure
+- [x] Complete the rules workspace with edit, active/inactive status, review completion, and review history
+- [x] Add owner-scoped rule review procedures and validation coverage
+- [x] Restore the backward-compatible identity-bridge export and restart the dev runtime without the stale module failure
+- [x] Verify that unauthenticated /rules requests safely redirect to the private sign-in gate
+- [ ] Complete an authenticated browser walkthrough of /rules create, edit, active toggle, review, and history flows
+- [ ] Add an optional non-mocked rule-review database integration check using explicitly supplied test identifiers

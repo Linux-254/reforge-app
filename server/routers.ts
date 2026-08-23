@@ -79,6 +79,12 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    responses: protectedProcedure
+      .input(z.object({ assessmentId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        return db.getAssessmentResponses(ctx.user.id, input.assessmentId);
+      }),
+
     completeAssessment: protectedProcedure
       .input(
         z.object({
@@ -272,7 +278,7 @@ export const appRouter = router({
     create: protectedProcedure
       .input(
         z.object({
-          body: z.string().min(1),
+          body: z.string().trim().min(1).max(20000),
           dimensionId: z.number().optional(),
           promptId: z.number().optional(),
         })
@@ -280,7 +286,7 @@ export const appRouter = router({
       .mutation(async ({ ctx, input }) => {
         await db.createJournalEntry(
           ctx.user.id,
-          input.body,
+          input.body.trim(),
           input.dimensionId,
           input.promptId
         );
@@ -292,21 +298,26 @@ export const appRouter = router({
         z.object({
           limit: z.number().int().min(1).max(50).default(20),
           offset: z.number().int().min(0).default(0),
+          dimensionId: z.number().int().positive().optional(),
+          promptId: z.number().int().positive().optional(),
         })
       )
       .query(async ({ ctx, input }) => {
-        return db.getJournalEntries(ctx.user.id, input.limit, input.offset);
+        return db.getJournalEntries(ctx.user.id, input.limit, input.offset, {
+          dimensionId: input.dimensionId,
+          promptId: input.promptId,
+        });
       }),
 
     update: protectedProcedure
       .input(
         z.object({
           entryId: z.number(),
-          body: z.string().min(1),
+          body: z.string().trim().min(1).max(20000),
         })
       )
       .mutation(async ({ ctx, input }) => {
-        await db.updateJournalEntry(ctx.user.id, input.entryId, input.body);
+        await db.updateJournalEntry(ctx.user.id, input.entryId, input.body.trim());
         return { success: true };
       }),
 
@@ -404,7 +415,7 @@ export const appRouter = router({
     create: protectedProcedure
       .input(
         z.object({
-          text: z.string().min(1),
+          text: z.string().trim().min(1).max(500),
           reviewCadence: z.enum(["daily", "weekly", "monthly"]).optional(),
         })
       )
@@ -424,17 +435,38 @@ export const appRouter = router({
     update: protectedProcedure
       .input(
         z.object({
-          ruleId: z.number(),
-          text: z.string().optional(),
-          isCompleted: z.boolean().optional(),
+          ruleId: z.number().int().positive(),
+          text: z.string().trim().min(1).max(500).optional(),
+          active: z.boolean().optional(),
+          reviewCadence: z.enum(["daily", "weekly", "monthly"]).optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
         await db.updateRule(ctx.user.id, input.ruleId, {
           text: input.text,
-          isCompleted: input.isCompleted,
+          active: input.active,
+          reviewCadence: input.reviewCadence,
         });
         return { success: true };
+      }),
+
+    review: protectedProcedure
+      .input(
+        z.object({
+          ruleId: z.number().int().positive(),
+          kept: z.boolean(),
+          notes: z.string().trim().max(2000).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.createRuleReview(ctx.user.id, input.ruleId, input.kept, input.notes);
+        return { success: true };
+      }),
+
+    reviews: protectedProcedure
+      .input(z.object({ ruleId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        return db.getRuleReviews(ctx.user.id, input.ruleId);
       }),
 
     remove: protectedProcedure

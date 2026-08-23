@@ -115,6 +115,16 @@ export async function createAuthIdentity(userId: number, provider: string, subje
   return result.length > 0 ? result[0] : undefined;
 }
 
+/**
+ * Backward-compatible name retained for staged-auth callers that predate the
+ * createAuthIdentity terminology. It delegates to the same unique mapping
+ * operation, so a provider subject cannot be linked to a second identity.
+ */
+export async function linkUserToExternalIdentity(userId: number, provider: string, subject: string) {
+  if (!provider.trim() || !subject.trim()) throw new Error("External identity provider and subject are required");
+  return createAuthIdentity(userId, provider.trim(), subject.trim());
+}
+
 export async function getUserById(id: number) {
   const db = await getDb();
   if (!db) return undefined;
