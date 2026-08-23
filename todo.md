@@ -77,13 +77,13 @@
 ### Progress Tracker
 - [x] Build dimension score visualization
 - [x] Create dimension score history charts
-- [ ] Implement phase progression display
+- [x] Implement phase progression display
 - [ ] Add responsive charts at all breakpoints
-- [ ] Create dimension detail view with scoring explanation
+- [x] Create dimension detail view with scoring explanation
 
 ### Journal Feature
 - [x] Build journal entry creation with guided prompts
-- [ ] Implement dimension-linked journal entries
+- [x] Implement dimension-linked journal entries
 - [ ] Add rich text editor for journal bodies
 - [x] Create journal entry list view
 - [x] Implement Tier-1 sensitive data encryption
@@ -321,3 +321,6 @@
 - [x] Add owner-scoped goal status/history procedures and validation coverage
 - [x] Implement and validate cadence-aware rule review behavior with due/overdue daily review states and cadence-driven UI
 - [ ] Complete an authenticated browser walkthrough of the /rules review flow covering cadence, active toggle, submission, and history
+- [x] Add a score-derived four-phase progression model to the active progress workspace
+- [x] Add responsive, keyboard-accessible dimension detail expansion with score history and explanation
+- [x] Extract and regression-test the score-derived progress phase policy used by the progress workspace
