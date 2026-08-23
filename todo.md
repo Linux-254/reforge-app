@@ -91,18 +91,18 @@
 
 ### Rules & Boundaries
 - [x] Build rules creation and editing UI
-- [ ] Implement daily review cadence
-- [ ] Create rule review history
-- [ ] Add rule status tracking (active/inactive)
-- [ ] Build review completion flow
+- [x] Implement daily review cadence
+- [x] Create rule review history
+- [x] Add rule status tracking (active/inactive)
+- [x] Build review completion flow
 
 ### Goal Tracker
-- [ ] Build goal creation (30/90/180 day horizons)
-- [ ] Implement goal step breakdown
-- [ ] Create goal progress visualization
-- [ ] Add goal status tracking (active/completed/abandoned)
-- [ ] Build goal history view
-- [ ] Link goals to dimensions
+- [x] Build goal creation (30/90/180 day horizons)
+- [x] Implement goal step breakdown
+- [x] Create goal progress visualization
+- [x] Add goal status tracking (active/completed/abandoned)
+- [x] Build goal history view
+- [x] Link goals to dimensions
 
 ## Phase 3: Content & Personalization (Weeks 13-18)
 
@@ -317,3 +317,7 @@
 - [x] Verify that unauthenticated /rules requests safely redirect to the private sign-in gate
 - [ ] Complete an authenticated browser walkthrough of /rules create, edit, active toggle, review, and history flows
 - [ ] Add an optional non-mocked rule-review database integration check using explicitly supplied test identifiers
+- [x] Complete the goals workspace with horizon selection, dimension linkage, editable steps, status transitions, and history
+- [x] Add owner-scoped goal status/history procedures and validation coverage
+- [x] Implement and validate cadence-aware rule review behavior with due/overdue daily review states and cadence-driven UI
+- [ ] Complete an authenticated browser walkthrough of the /rules review flow covering cadence, active toggle, submission, and history

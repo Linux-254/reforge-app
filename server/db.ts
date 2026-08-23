@@ -19,6 +19,7 @@ import {
   ruleReviews,
   goals,
   goalSteps,
+  goalStatusHistory,
   resources,
   musicProfiles,
   newsletterSubscriptions,
@@ -30,6 +31,7 @@ import {
   adminAuditLogs,
 } from "../drizzle/schema";
 import { ENV } from "./_core/env";
+import { getRuleReviewStatus } from "./ruleCadence";
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -537,6 +539,16 @@ export async function createGoal(
     description,
     status: "active",
   });
+
+  const [created] = await db
+    .select({ id: goals.id })
+    .from(goals)
+    .where(and(eq(goals.userId, userId), eq(goals.title, title)))
+    .orderBy(desc(goals.createdAt))
+    .limit(1);
+  if (created) {
+    await db.insert(goalStatusHistory).values({ goalId: created.id, userId, status: "active" });
+  }
 }
 
 export async function getActiveGoals(userId: number) {
@@ -569,38 +581,79 @@ export async function deleteGoal(userId: number, goalId: number) {
 export async function updateGoalStatus(userId: number, goalId: number, status: "active" | "completed" | "abandoned") {
   const db = await getDb();
   if (!db) return;
-  await db.update(goals).set({ status }).where(and(eq(goals.id, goalId), eq(goals.userId, userId)));
+  const [goal] = await db
+    .select({ id: goals.id, status: goals.status })
+    .from(goals)
+    .where(and(eq(goals.id, goalId), eq(goals.userId, userId)))
+    .limit(1);
+  if (!goal) return;
+  await db
+    .update(goals)
+    .set({ status, completedAt: status === "completed" ? new Date() : null })
+    .where(and(eq(goals.id, goalId), eq(goals.userId, userId)));
+  if (goal.status !== status) {
+    await db.insert(goalStatusHistory).values({ goalId, userId, status });
+  }
 }
 
 export async function getGoals(userId: number) {
   const db = await getDb();
   if (!db) return [];
-  return db.select().from(goals).where(eq(goals.userId, userId));
+  return db.select().from(goals).where(eq(goals.userId, userId)).orderBy(desc(goals.createdAt));
 }
 
 export async function addGoalStep(userId: number, goalId: number, title: string) {
   const db = await getDb();
   if (!db) return;
-
+  const [goal] = await db
+    .select({ id: goals.id })
+    .from(goals)
+    .where(and(eq(goals.id, goalId), eq(goals.userId, userId)))
+    .limit(1);
+  if (!goal) return;
   await db.insert(goalSteps).values({ goalId, title });
 }
 
 export async function getGoalSteps(userId: number, goalId: number) {
   const db = await getDb();
   if (!db) return [];
-
-  return db.select().from(goalSteps).where(eq(goalSteps.goalId, goalId));
+  const [goal] = await db
+    .select({ id: goals.id })
+    .from(goals)
+    .where(and(eq(goals.id, goalId), eq(goals.userId, userId)))
+    .limit(1);
+  if (!goal) return [];
+  return db.select().from(goalSteps).where(eq(goalSteps.goalId, goalId)).orderBy(asc(goalSteps.createdAt));
 }
 
 export async function toggleGoalStep(userId: number, goalId: number, stepId: number) {
   const db = await getDb();
   if (!db) return;
-
-  const step = await db.select().from(goalSteps).where(and(eq(goalSteps.id, stepId), eq(goalSteps.goalId, goalId))).limit(1);
-  if (step[0]) {
-    const nextDoneAt = step[0].doneAt ? null : new Date();
-    await db.update(goalSteps).set({ doneAt: nextDoneAt }).where(eq(goalSteps.id, stepId));
+  const [goal] = await db
+    .select({ id: goals.id })
+    .from(goals)
+    .where(and(eq(goals.id, goalId), eq(goals.userId, userId)))
+    .limit(1);
+  if (!goal) return;
+  const [step] = await db
+    .select({ id: goalSteps.id, doneAt: goalSteps.doneAt })
+    .from(goalSteps)
+    .where(and(eq(goalSteps.id, stepId), eq(goalSteps.goalId, goalId)))
+    .limit(1);
+  if (step) {
+    const nextDoneAt = step.doneAt ? null : new Date();
+    await db.update(goalSteps).set({ doneAt: nextDoneAt }).where(and(eq(goalSteps.id, stepId), eq(goalSteps.goalId, goalId)));
   }
+}
+
+export async function getGoalStatusHistory(userId: number, goalId: number) {
+  const db = await getDb();
+  if (!db) return [];
+  return db
+    .select()
+    .from(goalStatusHistory)
+    .where(and(eq(goalStatusHistory.userId, userId), eq(goalStatusHistory.goalId, goalId)))
+    .orderBy(desc(goalStatusHistory.changedAt));
 }
 
 // ============================================================================
@@ -990,6 +1043,35 @@ export async function getRules(userId: number) {
   const db = await getDb();
   if (!db) return [];
   return db.select().from(rulesBoundaries).where(eq(rulesBoundaries.userId, userId));
+}
+
+export async function getRulesWithReviewStatus(userId: number, now = new Date()) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rules = await getRules(userId);
+  if (rules.length === 0) return [];
+
+  const reviews = await db
+    .select({ ruleId: ruleReviews.ruleId, reviewDate: ruleReviews.reviewDate })
+    .from(ruleReviews)
+    .where(inArray(ruleReviews.ruleId, rules.map(rule => rule.id)))
+    .orderBy(desc(ruleReviews.reviewDate));
+
+  const latestReviewByRule = new Map<number, Date>();
+  for (const review of reviews) {
+    if (!latestReviewByRule.has(review.ruleId)) latestReviewByRule.set(review.ruleId, review.reviewDate);
+  }
+
+  return rules.map(rule => {
+    const status = getRuleReviewStatus({
+      active: rule.active,
+      reviewCadence: (rule.reviewCadence ?? "daily") as "daily" | "weekly" | "monthly",
+      createdAt: rule.createdAt,
+      lastReviewedAt: latestReviewByRule.get(rule.id) ?? null,
+    }, now);
+    return { ...rule, ...status } as const;
+  });
 }
 
 export async function updateRule(userId: number, ruleId: number, data: { text?: string; active?: boolean; reviewCadence?: "daily" | "weekly" | "monthly" }) {

@@ -122,25 +122,95 @@ export function JournalPage() {
   </Workspace>;
 }
 
-function GoalProgress({ goalId }: { goalId: number }) {
-  const stepsQuery = trpc.goals.steps.useQuery({ goalId });
-  if (stepsQuery.isLoading) return <div className="mt-4 h-1.5 animate-pulse rounded-full bg-muted" aria-label="Loading goal progress" />;
-  if (stepsQuery.isError) return <p className="mt-3 text-xs text-destructive">Progress is unavailable right now.</p>;
+type GoalRecord = {
+  id: number;
+  userId: number;
+  horizon: "30" | "90" | "180";
+  dimensionId: number | null;
+  title: string;
+  description: string | null;
+  status: "active" | "completed" | "abandoned" | null;
+  createdAt: Date;
+  completedAt: Date | null;
+  updatedAt: Date | null;
+};
+
+const goalStatuses = ["active", "completed", "abandoned"] as const;
+
+function GoalCard({ goal, dimensionLabel, onChanged }: { goal: GoalRecord; dimensionLabel?: string; onChanged: () => void }) {
+  const [stepInput, setStepInput] = useState("");
+  const stepsQuery = trpc.goals.steps.useQuery({ goalId: goal.id });
+  const historyQuery = trpc.goals.history.useQuery({ goalId: goal.id });
+  const addStepMutation = trpc.goals.addStep.useMutation({
+    onSuccess: () => { setStepInput(""); void stepsQuery.refetch(); },
+    onError: () => toast.error("We could not add that step. Try again."),
+  });
+  const toggleStepMutation = trpc.goals.toggleStep.useMutation({
+    onSuccess: () => { void stepsQuery.refetch(); onChanged(); },
+    onError: () => toast.error("We could not update that step. Try again."),
+  });
+  const statusMutation = trpc.goals.updateStatus.useMutation({
+    onSuccess: () => { toast.success("Goal status updated"); void historyQuery.refetch(); onChanged(); },
+    onError: () => toast.error("We could not update the goal status. Try again."),
+  });
   const steps = stepsQuery.data ?? [];
   const completed = steps.filter(step => step.doneAt != null).length;
   const progress = steps.length ? Math.round((completed / steps.length) * 100) : 0;
   const nextStep = steps.find(step => step.doneAt == null);
-  return <div className="mt-4" aria-label={`${completed} of ${steps.length} goal steps complete`}>
-    {steps.length ? <><Progress value={progress} className="h-1.5" /><p className="mt-2 text-xs text-muted-foreground">{completed} of {steps.length} steps complete{nextStep ? ` · Next: ${nextStep.title}` : " · All steps complete"}</p></> : <p className="text-xs text-muted-foreground">No steps yet. Add one small next action from the goal detail view.</p>}
-  </div>;
+  const currentStatus = goal.status ?? "active";
+
+  return <Card className="rounded-2xl border-border/70 bg-card/80 shadow-none">
+    <CardHeader>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div className="min-w-0">
+          <CardTitle className="font-serif text-xl">{goal.title}</CardTitle>
+          <CardDescription className="mt-2">{goal.description || "A meaningful step in your recovery practice."}</CardDescription>
+        </div>
+        <Badge variant="secondary" className="rounded-full">{goal.horizon} days</Badge>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 pt-2">
+        <Badge className="rounded-full bg-primary/10 text-primary hover:bg-primary/10">{dimensionLabel ?? "Whole-life practice"}</Badge>
+        <span className="text-xs text-muted-foreground">Started {new Date(goal.createdAt).toLocaleDateString()}</span>
+      </div>
+    </CardHeader>
+    <CardContent className="space-y-5">
+      <div className="space-y-2" aria-label={`${completed} of ${steps.length} goal steps complete`}>
+        <div className="flex items-center justify-between text-xs text-muted-foreground"><span>Next actions</span><span>{steps.length ? `${completed} of ${steps.length} complete` : "No steps yet"}</span></div>
+        <Progress value={progress} className="h-2" />
+        <p className="text-xs text-muted-foreground">{nextStep ? `Next: ${nextStep.title}` : steps.length ? "All steps complete. Let the goal settle into your story." : "Add one small action to make this goal easier to return to."}</p>
+      </div>
+      <div className="space-y-2">
+        {stepsQuery.isLoading ? <p className="text-sm text-muted-foreground">Loading steps…</p> : stepsQuery.isError ? <p className="text-sm text-destructive">Steps are unavailable right now.</p> : steps.map(step => <label key={step.id} className="flex items-center gap-3 rounded-xl border border-border/60 bg-muted/20 p-3 text-sm"><input type="checkbox" checked={Boolean(step.doneAt)} onChange={() => toggleStepMutation.mutate({ goalId: goal.id, stepId: step.id })} className="h-4 w-4 accent-primary" /> <span className={step.doneAt ? "text-muted-foreground line-through" : ""}>{step.title}</span></label>)}
+      </div>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <Input aria-label={`Add a step to ${goal.title}`} value={stepInput} onChange={(event) => setStepInput(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter" && stepInput.trim()) addStepMutation.mutate({ goalId: goal.id, title: stepInput.trim() }); }} placeholder="Add a small next action" className="rounded-xl" maxLength={255} />
+        <Button variant="outline" className="rounded-full" disabled={!stepInput.trim() || addStepMutation.isPending} onClick={() => addStepMutation.mutate({ goalId: goal.id, title: stepInput.trim() })}><Plus className="mr-2 h-4 w-4" /> Add step</Button>
+      </div>
+      <div className="space-y-3 border-t border-border/60 pt-4">
+        <div><p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Status</p><div className="mt-2 flex flex-wrap gap-2" role="group" aria-label={`Update status for ${goal.title}`}>{goalStatuses.map(status => <Button key={status} size="sm" variant={currentStatus === status ? "default" : "outline"} className="rounded-full capitalize" disabled={statusMutation.isPending || currentStatus === status} onClick={() => statusMutation.mutate({ goalId: goal.id, status })}>{status}</Button>)}</div></div>
+        {historyQuery.isLoading ? <p className="text-xs text-muted-foreground">Loading status history…</p> : historyQuery.isError ? <p className="text-xs text-destructive">Status history is unavailable.</p> : historyQuery.data?.length ? <div className="space-y-2"><p className="text-xs font-semibold uppercase tracking-[0.16em] text-muted-foreground">Recent history</p>{historyQuery.data.slice(0, 4).map(entry => <div key={entry.id} className="flex items-center justify-between gap-3 text-xs text-muted-foreground"><span className="capitalize">{entry.status}</span><time dateTime={new Date(entry.changedAt).toISOString()}>{new Date(entry.changedAt).toLocaleDateString()}</time></div>)}</div> : null}
+      </div>
+    </CardContent>
+  </Card>;
 }
 
 export function GoalsPage() {
   const [title, setTitle] = useState("");
   const [horizon, setHorizon] = useState<"30" | "90" | "180">("30");
-  const listQuery = trpc.goals.list.useQuery();
-  const createMutation = trpc.goals.create.useMutation({ onSuccess: () => { setTitle(""); void listQuery.refetch(); } });
-  return <Workspace><div className="mx-auto max-w-5xl space-y-7"><section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-[#4a3024] text-[#f7eddc]"><img src={REFORGE_ASSETS.goals} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" /><div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(74,48,36,.96),rgba(74,48,36,.55),rgba(74,48,36,.12))]" /><div className="relative max-w-2xl space-y-3 p-7 sm:p-10"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">Forward, not perfect</p><h1 className="font-serif text-4xl leading-tight sm:text-5xl">Goals that fit your real life.</h1><p className="text-sm leading-7 text-white/75 sm:text-base">Choose one next step at a time. You can change the shape of the journey as you learn.</p></div></section><Card className="rounded-2xl border-border/70 bg-card/85 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 font-serif text-2xl"><Plus className="h-5 w-5 text-primary" /> Add a goal</CardTitle></CardHeader><CardContent className="grid gap-4 md:grid-cols-[1fr_160px_auto] md:items-end"><div className="space-y-2"><Label htmlFor="goal-title">What would you like to move toward?</Label><Input id="goal-title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Take a walk after work three days this week" className="rounded-xl" /></div><div className="space-y-2"><Label htmlFor="goal-horizon">Horizon</Label><select id="goal-horizon" value={horizon} onChange={(event) => setHorizon(event.target.value as "30" | "90" | "180")} className="h-10 w-full rounded-xl border bg-background px-3 text-sm"><option value="30">30 days</option><option value="90">90 days</option><option value="180">180 days</option></select></div><Button disabled={!title.trim() || createMutation.isPending} onClick={() => createMutation.mutate({ title: title.trim(), horizon })} className="rounded-full">{createMutation.isPending ? "Creating…" : "Create goal"}</Button></CardContent></Card><div className="grid gap-4 md:grid-cols-2">{listQuery.isLoading ? [1, 2].map((item) => <Card key={item} className="h-36 animate-pulse rounded-2xl bg-muted/50" />) : listQuery.isError ? <Card className="md:col-span-2 rounded-2xl border-destructive/30"><CardContent className="pt-6 text-sm text-destructive">We could not load your goals right now.</CardContent></Card> : listQuery.data?.length ? listQuery.data.map((goal) => <Card key={goal.id} className="rounded-2xl border-border/70 bg-card/80 shadow-none"><CardHeader><div className="flex items-start justify-between gap-3"><CardTitle className="font-serif text-xl">{goal.title}</CardTitle><Badge variant="secondary" className="rounded-full">{goal.horizon} days</Badge></div><CardDescription>{goal.description || "A meaningful step in your recovery practice."}</CardDescription></CardHeader><CardContent><GoalProgress goalId={goal.id} /><p className="mt-2 text-xs text-muted-foreground">Created {new Date(goal.createdAt).toLocaleDateString()}</p></CardContent></Card>) : <Card className="md:col-span-2 rounded-2xl border-border/70 shadow-none"><CardContent className="pt-6"><EmptyState title="No active goals yet." description="Start with something small enough to keep." icon={Target} /></CardContent></Card>}</div></div></Workspace>;
+  const [description, setDescription] = useState("");
+  const [dimensionId, setDimensionId] = useState("none");
+  const goalsQuery = trpc.goals.all.useQuery();
+  const dimensionsQuery = trpc.onboarding.getDimensions.useQuery(undefined, { staleTime: 5 * 60 * 1000 });
+  const createMutation = trpc.goals.create.useMutation({
+    onSuccess: () => { toast.success("Goal created"); setTitle(""); setDescription(""); setDimensionId("none"); void goalsQuery.refetch(); },
+    onError: () => toast.error("We could not create that goal. Try again."),
+  });
+  const dimensionsById = new Map((dimensionsQuery.data ?? []).map(dimension => [dimension.id, dimension.label]));
+  return <Workspace><div className="mx-auto max-w-5xl space-y-7">
+    <section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-[#4a3024] text-[#f7eddc]"><img src={REFORGE_ASSETS.goals} alt="" className="absolute inset-0 h-full w-full object-cover opacity-40" /><div className="absolute inset-0 bg-[linear-gradient(105deg,rgba(74,48,36,.96),rgba(74,48,36,.55),rgba(74,48,36,.12))]" /><div className="relative max-w-2xl space-y-3 p-7 sm:p-10"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">Forward, not perfect</p><h1 className="font-serif text-4xl leading-tight sm:text-5xl">Goals that fit your real life.</h1><p className="text-sm leading-7 text-white/75 sm:text-base">Choose one next step at a time. You can change the shape of the journey as you learn.</p></div></section>
+    <Card className="rounded-2xl border-border/70 bg-card/85 shadow-none"><CardHeader><CardTitle className="flex items-center gap-2 font-serif text-2xl"><Plus className="h-5 w-5 text-primary" /> Add a goal</CardTitle><CardDescription>Give the next season a direction, then keep the action small enough to return to.</CardDescription></CardHeader><CardContent className="space-y-4"><div className="grid gap-4 md:grid-cols-[1fr_160px]"><div className="space-y-2"><Label htmlFor="goal-title">What would you like to move toward?</Label><Input id="goal-title" value={title} onChange={(event) => setTitle(event.target.value)} placeholder="e.g. Take a walk after work three days this week" className="rounded-xl" maxLength={255} /></div><div className="space-y-2"><Label htmlFor="goal-horizon">Horizon</Label><select id="goal-horizon" value={horizon} onChange={(event) => setHorizon(event.target.value as "30" | "90" | "180")} className="h-10 w-full rounded-xl border bg-background px-3 text-sm"><option value="30">30 days</option><option value="90">90 days</option><option value="180">180 days</option></select></div></div><div className="grid gap-4 md:grid-cols-2"><div className="space-y-2"><Label htmlFor="goal-dimension">Life dimension (optional)</Label><select id="goal-dimension" value={dimensionId} onChange={(event) => setDimensionId(event.target.value)} className="h-10 w-full rounded-xl border bg-background px-3 text-sm"><option value="none">Whole-life practice</option>{(dimensionsQuery.data ?? []).map(dimension => <option key={dimension.id} value={dimension.id}>{dimension.label}</option>)}</select></div><div className="space-y-2"><Label htmlFor="goal-description">Why it matters (optional)</Label><Textarea id="goal-description" value={description} onChange={(event) => setDescription(event.target.value)} placeholder="What will this unlock for you?" className="min-h-20 rounded-xl" maxLength={2000} /></div></div><Button disabled={!title.trim() || createMutation.isPending} onClick={() => createMutation.mutate({ title: title.trim(), horizon, description: description.trim() || undefined, dimensionId: dimensionId === "none" ? undefined : Number(dimensionId) })} className="rounded-full">{createMutation.isPending ? "Creating…" : "Create goal"}</Button></CardContent></Card>
+    <div className="grid gap-4 md:grid-cols-2">{goalsQuery.isLoading ? [1, 2].map(item => <Card key={item} className="h-72 animate-pulse rounded-2xl bg-muted/50" />) : goalsQuery.isError ? <Card className="md:col-span-2 rounded-2xl border-destructive/30"><CardContent className="pt-6 text-sm text-destructive">We could not load your goals right now. Please try again in a moment.</CardContent></Card> : goalsQuery.data?.length ? goalsQuery.data.map(goal => <GoalCard key={goal.id} goal={goal} dimensionLabel={goal.dimensionId ? dimensionsById.get(goal.dimensionId) : undefined} onChanged={() => void goalsQuery.refetch()} />) : <Card className="md:col-span-2 rounded-2xl border-border/70 shadow-none"><CardContent className="pt-6"><EmptyState title="No goals yet." description="Start with something small enough to keep. You can revise the shape of the journey as you learn." icon={Target} /></CardContent></Card>}</div>
+  </div></Workspace>;
 }
 
 export function MusicPage() {

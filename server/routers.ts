@@ -337,10 +337,10 @@ export const appRouter = router({
     create: protectedProcedure
       .input(
         z.object({
-          title: z.string().min(1),
+          title: z.string().trim().min(1).max(255),
           horizon: z.enum(["30", "90", "180"]),
-          dimensionId: z.number().optional(),
-          description: z.string().optional(),
+          dimensionId: z.number().int().positive().optional(),
+          description: z.string().trim().max(2000).optional(),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -366,7 +366,7 @@ export const appRouter = router({
       .input(
         z.object({
           goalId: z.number(),
-          title: z.string().min(1),
+          title: z.string().trim().min(1).max(255),
         })
       )
       .mutation(async ({ ctx, input }) => {
@@ -399,8 +399,14 @@ export const appRouter = router({
         return { success: true };
       }),
 
+    history: protectedProcedure
+      .input(z.object({ goalId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        return db.getGoalStatusHistory(ctx.user.id, input.goalId);
+      }),
+
     remove: protectedProcedure
-      .input(z.object({ goalId: z.number() }))
+      .input(z.object({ goalId: z.number().int().positive() }))
       .mutation(async ({ ctx, input }) => {
         await db.deleteGoal(ctx.user.id, input.goalId);
         return { success: true };
@@ -428,8 +434,12 @@ export const appRouter = router({
       return db.getActiveRules(ctx.user.id);
     }),
 
+    listWithStatus: protectedProcedure.query(async ({ ctx }) => {
+      return db.getRulesWithReviewStatus(ctx.user.id);
+    }),
+
     all: protectedProcedure.query(async ({ ctx }) => {
-      return db.getRules(ctx.user.id);
+      return db.getRulesWithReviewStatus(ctx.user.id);
     }),
 
     update: protectedProcedure

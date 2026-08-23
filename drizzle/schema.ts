@@ -594,6 +594,27 @@ export const goalSteps = pgTable(
 export type GoalStep = typeof goalSteps.$inferSelect;
 export type InsertGoalStep = typeof goalSteps.$inferInsert;
 
+/**
+ * Owner-scoped status transitions for goal history and honest progress review.
+ */
+export const goalStatusHistory = pgTable(
+  "goal_status_history",
+  {
+    id: id(),
+    goalId: integer("goalId").notNull(),
+    userId: integer("userId").notNull(),
+    status: goalStatusEnum("status").notNull(),
+    changedAt: timestamp("changedAt", { withTimezone: true }).notNull().defaultNow(),
+  },
+  table => ({
+    goalIdIdx: index("goal_status_history_goalId_idx").on(table.goalId),
+    userIdIdx: index("goal_status_history_userId_idx").on(table.userId),
+  })
+);
+
+export type GoalStatusHistory = typeof goalStatusHistory.$inferSelect;
+export type InsertGoalStatusHistory = typeof goalStatusHistory.$inferInsert;
+
 // ============================================================================
 // CONTENT THE PLATFORM SERVES
 // ============================================================================
