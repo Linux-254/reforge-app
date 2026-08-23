@@ -266,3 +266,4 @@
 - [ ] Add runtime-backed supporter-link persistence verification against the deployed database driver
 - [x] Add dedicated restorative sign-in route with accessible OAuth entry and home escape link
 - [x] Promote verified ReForge changes through GitHub branches features -> dev -> staging -> main
+- [x] Add a discreet quick-exit affordance to the authenticated shell with keyboard-accessible navigation away from private screens

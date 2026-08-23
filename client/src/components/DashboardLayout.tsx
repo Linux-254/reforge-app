@@ -155,6 +155,7 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
   }, [isResizing, setSidebarWidth]);
 
   const initials = (user?.name || user?.email || "R").slice(0, 1).toUpperCase();
+  const quickExit = () => window.location.replace("/");
 
   return (
     <>
@@ -205,6 +206,10 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
           </SidebarContent>
 
           <SidebarFooter className="border-t border-sidebar-border/60 p-3">
+            <button type="button" onClick={quickExit} className="mb-2 flex h-9 w-full items-center gap-2 rounded-xl px-2 text-xs font-medium text-sidebar-foreground/65 transition-colors hover:bg-sidebar-accent hover:text-sidebar-foreground focus:outline-none focus-visible:ring-2 focus-visible:ring-ring group-data-[collapsible=icon]:justify-center" aria-label="Quick exit to ReForge home">
+              <LogOut className="h-4 w-4 shrink-0" />
+              <span className="group-data-[collapsible=icon]:hidden">Quick exit</span>
+            </button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex w-full items-center gap-3 rounded-xl px-1 py-1.5 text-left transition-colors hover:bg-sidebar-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-ring group-data-[collapsible=icon]:justify-center">
@@ -234,7 +239,10 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
               <SidebarTrigger className="h-9 w-9 rounded-xl" />
               <span className="font-serif text-xl font-semibold">{activeMenuItem?.label ?? "ReForge"}</span>
             </div>
-            <button onClick={() => setLocation("/dashboard")} className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-label="Go to overview"><Home className="h-4 w-4" /></button>
+            <div className="flex items-center gap-2">
+              <button onClick={quickExit} className="flex h-9 w-9 items-center justify-center rounded-xl bg-[#ead8bf]/55 text-[#85533b]" aria-label="Quick exit to ReForge home"><LogOut className="h-4 w-4" /></button>
+              <button onClick={() => setLocation("/dashboard")} className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary/10 text-primary" aria-label="Go to overview"><Home className="h-4 w-4" /></button>
+            </div>
           </div>
         )}
         <main className="min-h-[calc(100vh-3.5rem)] p-4 sm:p-6 lg:p-8">{children}</main>
