@@ -10,6 +10,7 @@ type UseAuthOptions = {
 };
 
 export function useAuth(options?: UseAuthOptions) {
+  const demoMode = import.meta.env.VITE_DEMO_MODE !== "false";
   // Login is started via startLogin() in the effect below, only when we actually
   // navigate — never during render. startLogin() mints a one-time nonce + writes
   // the state cookie, so calling it per render would overwrite the cookie and
@@ -18,6 +19,7 @@ export function useAuth(options?: UseAuthOptions) {
   const utils = trpc.useUtils();
 
   const meQuery = trpc.auth.me.useQuery(undefined, {
+    enabled: !demoMode,
     retry: false,
     refetchOnWindowFocus: false,
   });
@@ -57,12 +59,13 @@ export function useAuth(options?: UseAuthOptions) {
       JSON.stringify(meQuery.data)
     );
     return {
-      user: meQuery.data ?? null,
-      loading: meQuery.isLoading || logoutMutation.isPending,
+      user: demoMode ? null : meQuery.data ?? null,
+      loading: demoMode ? false : meQuery.isLoading || logoutMutation.isPending,
       error: meQuery.error ?? logoutMutation.error ?? null,
       isAuthenticated: Boolean(meQuery.data),
     };
   }, [
+    demoMode,
     meQuery.data,
     meQuery.error,
     meQuery.isLoading,
@@ -71,15 +74,15 @@ export function useAuth(options?: UseAuthOptions) {
   ]);
 
   useEffect(() => {
-    if (meQuery.isLoading || !state.user || typeof window === "undefined") return;
+    if (demoMode || meQuery.isLoading || !state.user || typeof window === "undefined") return;
     try {
       window.sessionStorage.removeItem(OAUTH_PENDING_KEY);
     } catch {}
     window.dispatchEvent(new Event("reforge:oauth-complete"));
-  }, [meQuery.isLoading, state.user]);
+  }, [demoMode, meQuery.isLoading, state.user]);
 
   useEffect(() => {
-    if (!redirectOnUnauthenticated) return;
+    if (demoMode || !redirectOnUnauthenticated) return;
     if (meQuery.isLoading || logoutMutation.isPending) return;
     if (state.user) return;
     if (typeof window === "undefined") return;
@@ -92,6 +95,7 @@ export function useAuth(options?: UseAuthOptions) {
       startLogin();
     }
   }, [
+    demoMode,
     redirectOnUnauthenticated,
     redirectPath,
     logoutMutation.isPending,

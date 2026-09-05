@@ -1,18 +1,43 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { ArrowRight, Leaf, ShieldCheck } from "lucide-react";
+import { ArrowRight, Leaf, ShieldCheck, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { startLogin } from "@/const";
 import { natureAsset } from "@/config/assets";
 import { getSupabaseAuthClient, startSupabaseGoogleSignIn, supabaseAuthEnabled } from "@/lib/supabaseAuth";
 
 export default function SignIn() {
+  const demoMode = import.meta.env.VITE_DEMO_MODE !== "false";
   const [supabaseLoading, setSupabaseLoading] = useState(false);
 
   async function handleSupabaseSignIn() {
     setSupabaseLoading(true);
     const result = await startSupabaseGoogleSignIn();
     if (result.error) setSupabaseLoading(false);
+  }
+
+  if (demoMode) {
+    return (
+      <main className="relative min-h-[calc(100vh-4.6rem)] overflow-hidden bg-[oklch(0.96_0.025_105)]">
+        <img src={natureAsset("signIn")} alt="Soft light through green leaves" className="absolute inset-0 h-full w-full object-cover opacity-45" />
+        <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(247,245,232,.96),rgba(247,245,232,.72),rgba(39,58,43,.22))]" />
+        <div className="container relative grid min-h-[calc(100vh-4.6rem)] items-center gap-12 py-16 lg:grid-cols-[1fr_430px]">
+          <section className="max-w-xl">
+            <Link href="/" className="inline-flex items-center gap-2 text-sm font-medium text-primary hover:underline"><Leaf className="h-4 w-4" /> Return to the garden</Link>
+            <p className="mt-12 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Open public demo</p>
+            <h1 className="mt-4 font-serif text-5xl leading-[0.98] text-[oklch(0.26_0.055_145)] sm:text-6xl">Come back to what matters.</h1>
+            <p className="mt-6 max-w-lg text-lg leading-8 text-foreground/65">Explore the ReForge recovery journey without an account. Your demo reflections remain in this browser.</p>
+          </section>
+          <section className="nature-card bg-background/88 p-7 shadow-[0_24px_70px_-35px_rgba(39,58,43,.6)] backdrop-blur-xl sm:p-9" aria-labelledby="demo-title">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/12 text-primary"><Sparkles className="h-6 w-6" /></div>
+            <h2 id="demo-title" className="mt-7 font-serif text-3xl text-[oklch(0.3_0.055_145)]">Enter the garden</h2>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">No sign-in, account, or Manus session is needed. This is a browser-isolated product demo.</p>
+            <Link href="/dashboard" className="mt-8 flex h-12 w-full items-center justify-center rounded-full bg-primary px-5 text-sm font-semibold text-primary-foreground transition-transform hover:-translate-y-0.5">Explore the demo <ArrowRight className="ml-2 h-4 w-4" /></Link>
+            <p className="mt-5 text-center text-xs leading-5 text-muted-foreground">Demo data is stored locally and can be cleared from Settings.</p>
+          </section>
+        </div>
+      </main>
+    );
   }
 
   return (

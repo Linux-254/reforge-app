@@ -43,6 +43,7 @@ import {
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
+import GuestDemoWorkspace from "./GuestDemoWorkspace";
 import { Button } from "./ui/button";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
@@ -91,6 +92,7 @@ export function SignInGate() {
 }
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const demoMode = import.meta.env.VITE_DEMO_MODE !== "false";
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
@@ -101,6 +103,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
+  if (demoMode) return <GuestDemoWorkspace>{children}</GuestDemoWorkspace>;
   if (loading) return <DashboardLayoutSkeleton />;
   if (!user) return <SignInGate />;
 

@@ -324,3 +324,8 @@
 - [x] Add a score-derived four-phase progression model to the active progress workspace
 - [x] Add responsive, keyboard-accessible dimension detail expansion with score history and explanation
 - [x] Extract and regression-test the score-derived progress phase policy used by the progress workspace
+- [x] Add a feature-flagged no-sign-in public demo mode with browser-isolated guest data and a clear demo disclosure
+- [x] Ensure protected recovery routes open directly in guest mode without invoking Manus or Supabase authentication
+- [x] Add regression coverage proving guest data stays isolated per browser and sensitive fields are not sent to shared anonymous server procedures
+- [x] Add open-source README, license, local setup instructions, and no-auth demo safety documentation
+- [x] Create a downloadable source archive for the open-source ReForge demo

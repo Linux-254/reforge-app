@@ -15,10 +15,12 @@ function hasPendingOAuth() {
 }
 
 export function OAuthLoadingOverlay() {
-  const [visible, setVisible] = useState(hasPendingOAuth);
+  const demoMode = import.meta.env.VITE_DEMO_MODE !== "false";
+  const [visible, setVisible] = useState(() => !demoMode && hasPendingOAuth());
   const [closing, setClosing] = useState(false);
 
   useEffect(() => {
+    if (demoMode) return;
     let closeTimer: number | undefined;
     let timeoutTimer: number | undefined;
 
@@ -67,7 +69,7 @@ export function OAuthLoadingOverlay() {
       window.removeEventListener(OAUTH_PENDING_EVENT, handlePending);
       window.removeEventListener("reforge:oauth-complete", handleComplete);
     };
-  }, []);
+  }, [demoMode]);
 
   if (!visible) return null;
 

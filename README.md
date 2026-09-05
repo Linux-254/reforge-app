@@ -1,83 +1,73 @@
-# ReForge (Project Compass)
+# ReForge
 
-A web-based sober-lifestyle platform guiding people through a structured
-**3-to-6-month** journey from substance dependence back into productive,
-community-integrated life. Standalone digital companion first, community
-bridge second. Not therapy, not a medical tool.
+ReForge is a nature-led recovery companion that helps people notice the next honest step across daily check-ins, private reflection, goals, boundaries, progress, and practical guides. The project is open source and released under the MIT License.
 
-This repository is the **full-stack production build** that supersedes the
-static Lovable prototype. See `docs/00-ENGINEERING-GUIDE.md` for the master
-engineering guide, `docs/01-CURRENT-STATE.md` for the original state doc, and
-`docs/03-HANDOFF.md` for the completed-state handoff.
+The current public preview runs in **no-sign-in demo mode**. Visitors can open the app directly without a Manus, Supabase, or passkey account. Demo journal entries, check-ins, goal progress, and boundary reviews are stored in the browser's local storage for that site origin; they are not sent to the shared ReForge database. This mode is intended for product demonstrations and local exploration, not clinical records or production storage of sensitive information.
 
-## Stack
+## What is included
 
-- **Frontend:** React 19, Vite 7, Tailwind CSS v4, shadcn/ui (Radix), wouter,
-  TanStack Query, tRPC React client, recharts
-- **Backend:** Express, tRPC 11 (superjson), Drizzle ORM, JWT sessions (jose),
-  helmet, cors, express-rate-limit
-- **Database:** PostgreSQL via Supabase (`postgres-js` driver), Drizzle schema
-  with generated migrations
-- **Auth:** OAuth portal login with CSRF state cookie, signed session cookie,
-  `Bearer` fallback
-- **Security:** RBAC role procedures (`roleProcedure`/`adminProcedure`),
-  per-record ownership checks, Tier-1 field-level encryption (AES-256-GCM) for
-  journal/assessment/check-in free text, rate limiting, CORS allowlist
+| Area | Demo experience |
+| --- | --- |
+| Overview | A quiet landing place with daily rhythm, quick actions, and demo status cards |
+| Today | A local morning check-in with a browser-only completion state |
+| Journal | A local reflection composer with private browser storage and reset controls |
+| Progress | Nature-led dimension cards and demo progress signals |
+| Goals | A 30-day example goal with a locally persisted next step |
+| Boundaries | A daily boundary review with a local completion state |
+| Guides | Practical recovery prompts and reflection entry points |
+| Settings | Privacy explanation and one-click local demo reset |
 
-## Quick start
+The full-stack implementation remains in the repository. Its protected tRPC procedures, PostgreSQL/Drizzle schema, ownership checks, field-level encryption, Manus authentication, and staged Supabase authentication path are retained for a future authenticated build. Guest demo mode deliberately does not invoke those protected procedures.
+
+## Run the public demo locally
+
+The only requirement for the browser-isolated demo is Node.js and pnpm.
 
 ```bash
 pnpm install
-cp .env.example .env        # set DATABASE_URL + OAuth/JWT secrets
-pnpm db:push                # generate + apply migrations (or pnpm db:migrate)
-pnpm db:seed                # seed 21 life dimensions + starter content
-pnpm dev                    # tsx watch on server/_core/index.ts
+pnpm dev
 ```
 
-- `pnpm check` — TypeScript typecheck
-- `pnpm test` — Vitest unit tests
-- `pnpm build` — Vite (client) + esbuild (server) production bundle
-- `pnpm start` — run the production build
+Open the local URL printed by the development server and choose **Explore the demo**. The application defaults to public demo mode. To exercise the retained authenticated/full-stack path in a controlled environment, set `VITE_DEMO_MODE=false` and provide the required database, session, OAuth, and encryption configuration described in `.env.example`.
 
-## Feature surface
+Useful commands are shown below.
 
-**Public site** (`client/src/pages/site/`): Home, About, How It Works,
-Dimensions, Daily Practice, Success, FAQ, Supporters, Contact, Privacy, Terms,
-newsletter signup — warm stone/amber theme, shared `SiteLayout`.
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Start the development server |
+| `pnpm check` | Run the TypeScript compiler without emitting files |
+| `pnpm test` | Run the Vitest suite |
+| `pnpm build` | Build the Vite client and bundled server |
+| `pnpm start` | Start the production bundle |
 
-**App** (`client/src/pages/`):
+## Privacy and demo safety
 
-| Route         | Purpose                                                                        |
-| ------------- | ------------------------------------------------------------------------------ |
-| `/dashboard`  | Welcome, streak cards, today's check-ins, 21-dimension progress, quick actions |
-| `/onboarding` | Conversational onboarding: substance → profile → 21 dimension scores           |
-| `/progress`   | Bar chart of all dimensions + per-dimension history line chart                 |
-| `/check-in`   | Morning/evening daily reflection (mood, energy, cravings, notes)               |
-| `/check-ins`  | History, current/longest streak, milestone badges (7/14/30/60/90/180)          |
-| `/journal`    | Encrypted private journal entries (create/delete, paginated)                   |
-| `/rules`      | Rules & boundaries (add, toggle active, cadence, remove)                       |
-| `/goals`      | 30/90/180-day goals with actionable steps (toggle, complete, delete)           |
-| `/guides`     | Library: activities, situations, relationships, devotionals, articles          |
-| `/music`      | Trigger/safe genre map + saved safe playlists                                  |
-| `/devotional` | Daily devotional (deterministic rotation)                                      |
-| `/newsletter` | Subscribe/unsubscribe, content preferences, past editions                      |
-| `/settings`   | Profile, notification toggles, account                                         |
-| `/admin`      | RBAC role management + newsletter issue publishing (admin only)                |
+> **The no-sign-in mode is a product demo, not a secure personal account.** Do not enter real names, clinical details, crisis disclosures, treatment records, or other sensitive information into a public demo deployment.
 
-## Server layout
+The demo uses browser-local storage under ReForge-specific keys and includes a reset action in Settings. Clearing the site's browser data also clears the demo state for that browser. Because no account is established, demo data cannot be recovered across devices and is not available to another browser profile.
 
-- `server/_core/` — Express bootstrap, OAuth/session SDK, tRPC
-  `publicProcedure`/`protectedProcedure`/`roleProcedure`/`adminProcedure`,
-  context (loads `userRoles`), helmet/CORS/rate-limit middleware
-- `server/db/` — modular Postgres data-access layer (`client`, `users`,
-  `profiles`, `dimensions`, `assessment`, `checkins`, `journal`, `goals`,
-  `rules`, `scores`, `music`, `newsletter`, `preferences`, `resources`)
-- `server/lib/encryption.ts` — AES-256-GCM Tier-1 encryption (`enc:v1:` prefix)
-- `server/routers.ts` — tRPC app router for every feature area
-- `server/seed.ts` + `server/seed-content.ts` — dimension + content seeding
+The server-side encrypted workflows remain protected rather than being weakened for anonymous access. This is intentional: anonymous shared persistence would not provide a trustworthy ownership boundary for journals, check-ins, assessment responses, goals, or rule reviews.
 
-## Branches
+## Full-stack development
 
-`feature/db-postgres-supabase` (all work) → `dev` → `staging` → `main`.
-`main` is the production-ready branch; GitHub remote:
-`https://github.com/Linux-254/project-compass.git`.
+The retained production path uses React 19, Vite, Tailwind CSS v4, shadcn/ui, wouter, TanStack Query, tRPC 11, Express, Drizzle ORM, PostgreSQL-compatible storage, JWT session cookies, and optional Supabase Auth staging. Sensitive fields use the project's Tier-1 AES-256-GCM encryption boundary. Review the engineering material under `docs/` before enabling authenticated storage.
+
+```text
+client/       React pages, components, guest demo workspace, and client policies
+server/       Express/tRPC procedures and protected data-access helpers
+drizzle/      Drizzle schema and reviewed migration artifacts
+shared/       Shared types and constants
+docs/         Engineering, handoff, demo safety, and migration notes
+```
+
+## Open-source contribution
+
+Please open an issue before a large architectural change. Contributions should include focused tests for security boundaries, ownership checks, and data-isolation behavior. Do not add fabricated testimonials, reviews, or recovery outcomes. Do not commit `.env`, database credentials, session keys, generated build output, or user data.
+
+## License
+
+ReForge is available under the MIT License. See [`LICENSE`](./LICENSE).
+
+## Project status
+
+The public no-sign-in demo is the active preview surface. The authenticated Manus flow and staged Supabase integration remain available behind the demo flag for continued engineering, but they are not required for visitors who only want to explore the product.
