@@ -21,7 +21,8 @@ import Devotional from "@/pages/Devotional";
 import Admin from "@/pages/Admin";
 import { NewsletterPage } from "@/pages/AdditionalFeatures";
 import RulesPage from "@/pages/Rules";
-import { GoalsPage, GuidesPage, JournalPage, MusicPage, ProgressPage } from "@/pages/RecoveryWorkspace";
+import { GoalsPage, JournalPage, MusicPage, ProgressPage } from "@/pages/RecoveryWorkspace";
+import Guides from "@/pages/Guides";
 import Settings from "@/pages/Settings";
 import OnboardingPage from "@/pages/Onboarding";
 import { Route, Switch } from "wouter";
@@ -52,7 +53,7 @@ function Router() {
       <Route path={"/journal"} component={JournalPage} />
       <Route path={"/rules"} component={RulesPage} />
       <Route path={"/goals"} component={GoalsPage} />
-      <Route path={"/guides"} component={GuidesPage} />
+      <Route path={"/guides"} component={Guides} />
       <Route path={"/music"} component={MusicPage} />
       <Route path={"/devotional"} component={Devotional} />
       <Route path={"/newsletter"} component={NewsletterPage} />

@@ -107,23 +107,23 @@
 ## Phase 3: Content & Personalization (Weeks 13-18)
 
 ### Activity Guides
-- [ ] Create activity guide content structure
+- [x] Create activity guide content structure
 - [ ] Build activity guide recommendation engine
 - [ ] Implement context-based filtering (job type, energy, time, interests)
-- [ ] Create activity guide detail view
+- [x] Create activity guide detail view
 - [ ] Add activity tracking
 
 ### Situation Guides
-- [ ] Create situation guide content structure
+- [x] Create situation guide content structure
 - [ ] Build situation trigger detection
 - [ ] Implement situation guide recommendation
-- [ ] Create situation guide detail view
+- [x] Create situation guide detail view
 
 ### Relationship Repair Guides
-- [ ] Create relationship guide content structure
+- [x] Create relationship guide content structure
 - [ ] Build relationship context assessment
 - [ ] Implement relationship guide recommendation
-- [ ] Create guide detail view
+- [x] Create guide detail view
 
 ### Faith/Secular Devotional Space
 - [ ] Build faith preference selection in onboarding
@@ -133,10 +133,10 @@
 - [ ] Add devotional reflection prompts
 
 ### Resource Library
-- [ ] Create resource content structure
-- [ ] Build resource search and filtering
-- [ ] Implement dimension-based resource organization
-- [ ] Create resource detail view
+- [x] Create resource content structure
+- [x] Build resource search and filtering
+- [x] Implement dimension-based resource organization
+- [x] Create resource detail view
 - [ ] Add resource bookmarking
 
 ### Music Rehabilitation
@@ -329,3 +329,6 @@
 - [x] Add regression coverage proving guest data stays isolated per browser and sensitive fields are not sent to shared anonymous server procedures
 - [x] Add open-source README, license, local setup instructions, and no-auth demo safety documentation
 - [x] Create a downloadable source archive for the open-source ReForge demo
+- [x] Read and verify the routed Guides library and guide metadata helper against the active App route
+- [x] Run successful typecheck, tests, and production build after the guides implementation
+- [x] Add focused regression tests for guide filtering, dimension organization, and detail-route behavior
