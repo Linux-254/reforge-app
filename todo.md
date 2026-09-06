@@ -336,3 +336,7 @@
 - [x] Verify /dashboard, /check-ins, /journal, and /guides render without sign-in in the public demo
 - [x] Add a browser-local no-sign-in newsletter preview and preference flow that never invokes protected newsletter procedures
 - [x] Add regression coverage for guest newsletter preference isolation and reset behavior
+
+- [x] Verify public demo routes at 375px, 768px, and 1440px with no visible clipping in the core guest workflows
+- [x] Refresh the sanitized open-source download archive after the newsletter demo branch
+- [ ] Complete full responsive verification for every authenticated route after sign-in is available
