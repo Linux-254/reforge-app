@@ -35,6 +35,9 @@ const quickLinks = [
 ];
 
 export default function Dashboard() {
+  const demoMode = import.meta.env.VITE_DEMO_MODE !== "false";
+  if (demoMode) return <DashboardLayout>{null}</DashboardLayout>;
+
   const { user } = useAuth({ redirectOnUnauthenticated: true, redirectPath: "/" });
   const [, setLocation] = useLocation();
   const dashboardQuery = trpc.dashboard.getOverview.useQuery();

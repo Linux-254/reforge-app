@@ -332,3 +332,5 @@
 - [x] Read and verify the routed Guides library and guide metadata helper against the active App route
 - [x] Run successful typecheck, tests, and production build after the guides implementation
 - [x] Add focused regression tests for guide filtering, dimension organization, and detail-route behavior
+- [x] Fix the direct /dashboard guest route so it renders the browser-local demo instead of a protected-query loading state
+- [x] Verify /dashboard, /check-ins, /journal, and /guides render without sign-in in the public demo
