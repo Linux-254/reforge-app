@@ -340,3 +340,5 @@
 - [x] Verify public demo routes at 375px, 768px, and 1440px with no visible clipping in the core guest workflows
 - [x] Refresh the sanitized open-source download archive after the newsletter demo branch
 - [ ] Complete full responsive verification for every authenticated route after sign-in is available
+- [x] Exclude internal checkpoint metadata, build output, dependencies, and environment files from the downloadable source archive
+- [x] Re-run the full Vitest suite, TypeScript check, production build, and ZIP integrity validation after the archive refresh
