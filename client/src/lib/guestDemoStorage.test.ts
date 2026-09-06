@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { clearGuestDemoData, GUEST_STORAGE_KEYS, readGuestBoolean, readGuestJournal, writeGuestBoolean, writeGuestJournal } from "./guestDemoStorage";
+import { clearGuestDemoData, GUEST_STORAGE_KEYS, readGuestBoolean, readGuestJournal, readGuestNewsletterPreferences, writeGuestBoolean, writeGuestJournal, writeGuestNewsletterPreferences } from "./guestDemoStorage";
 
 const originalStorage = globalThis.localStorage;
 
@@ -30,9 +30,18 @@ describe("guest demo storage", () => {
     expect(localStorage.getItem("unrelated-site-key")).toBeNull();
   });
 
+  it("round-trips newsletter preferences and resets them with the guest namespace", () => {
+    installMemoryStorage();
+    writeGuestNewsletterPreferences({ subscribed: true, daily: false, weekly: true, milestones: false });
+    expect(readGuestNewsletterPreferences()).toEqual({ subscribed: true, daily: false, weekly: true, milestones: false });
+    clearGuestDemoData();
+    expect(readGuestNewsletterPreferences()).toEqual({ subscribed: false, daily: true, weekly: true, milestones: true });
+  });
+
   it("ignores malformed journal payloads and clears every guest key without touching unrelated keys", () => {
     installMemoryStorage();
     localStorage.setItem(GUEST_STORAGE_KEYS.journal, "not-json");
+    localStorage.setItem(GUEST_STORAGE_KEYS.newsletter, "not-json");
     localStorage.setItem("unrelated-site-key", "keep-me");
     expect(readGuestJournal()).toEqual([]);
     writeGuestBoolean("checkIn", true);

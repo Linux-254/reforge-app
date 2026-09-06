@@ -29,6 +29,11 @@ import {
 } from "lucide-react";
 import { useLocation } from "wouter";
 import { useState } from "react";
+import {
+  readGuestNewsletterPreferences,
+  writeGuestNewsletterPreferences,
+  type GuestNewsletterPreferences,
+} from "@/lib/guestDemoStorage";
 
 const ISSUE_TYPE_LABEL: Record<string, string> = {
   daily: "Daily",
@@ -46,6 +51,66 @@ type Issue = {
   scheduledFor: Date | null;
 };
 
+function GuestNewsletter() {
+  const [, setLocation] = useLocation();
+  const [preferences, setPreferences] = useState<GuestNewsletterPreferences>(() => readGuestNewsletterPreferences());
+
+  const update = (patch: Partial<GuestNewsletterPreferences>) => {
+    setPreferences(current => {
+      const next = { ...current, ...patch };
+      writeGuestNewsletterPreferences(next);
+      return next;
+    });
+  };
+
+  return (
+    <div className="min-h-screen bg-[oklch(0.97_0.02_95)] text-[oklch(0.25_0.04_145)]">
+      <div className="border-b border-[oklch(0.86_0.05_95)] bg-white/75 backdrop-blur">
+        <div className="mx-auto flex max-w-3xl items-center gap-4 px-4 py-4">
+          <Button variant="ghost" size="sm" onClick={() => setLocation("/dashboard")} className="gap-2">
+            <ArrowLeft className="h-4 w-4" /> Back to demo
+          </Button>
+          <div>
+            <h1 className="text-xl font-semibold">Newsletter preview</h1>
+            <p className="text-sm text-muted-foreground">A local sample of supportive words, on your schedule</p>
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto max-w-3xl space-y-6 px-4 py-8">
+        <Card className="border-[oklch(0.78_0.08_145)] bg-white/80 shadow-[0_16px_50px_-28px_oklch(0.3_0.05_145)]">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2"><Mail className="h-5 w-5 text-[oklch(0.42_0.1_145)]" /> Demo preferences</CardTitle>
+            <CardDescription>These settings stay only in this browser. No email address or server request is used in public demo mode.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-5">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3"><Checkbox id="guest-newsletter-daily" checked={preferences.daily} onCheckedChange={checked => update({ daily: checked === true })} /><Label htmlFor="guest-newsletter-daily">Daily reflections & reminders</Label></div>
+              <div className="flex items-center gap-3"><Checkbox id="guest-newsletter-weekly" checked={preferences.weekly} onCheckedChange={checked => update({ weekly: checked === true })} /><Label htmlFor="guest-newsletter-weekly">Weekly roundup & encouragement</Label></div>
+              <div className="flex items-center gap-3"><Checkbox id="guest-newsletter-milestones" checked={preferences.milestones} onCheckedChange={checked => update({ milestones: checked === true })} /><Label htmlFor="guest-newsletter-milestones">Milestone celebrations & new guides</Label></div>
+            </div>
+            <Button onClick={() => { update({ subscribed: !preferences.subscribed }); toast.success(preferences.subscribed ? "Local preview unsubscribed" : "Local preview subscribed"); }} className="gap-2">
+              {preferences.subscribed ? <MailCheck className="h-4 w-4" /> : <Mail className="h-4 w-4" />}
+              {preferences.subscribed ? "Unsubscribe from preview" : "Subscribe to preview"}
+            </Button>
+          </CardContent>
+        </Card>
+        <Card className="border-[oklch(0.86_0.05_95)] bg-white/70">
+          <CardHeader><CardTitle className="flex items-center gap-2"><Newspaper className="h-5 w-5 text-[oklch(0.56_0.12_65)]" /> Sample editions</CardTitle></CardHeader>
+          <CardContent className="space-y-3">
+            {["A steadier morning", "When the old pattern calls", "Small evidence of change"].map((subject, index) => (
+              <div key={subject} className="rounded-xl border border-[oklch(0.88_0.04_95)] bg-white/75 p-4">
+                <Badge variant="outline" className="mb-2">{index === 0 ? "Daily" : index === 1 ? "Situation" : "Milestone"}</Badge>
+                <p className="font-medium">{subject}</p>
+                <p className="mt-1 text-sm text-muted-foreground">A short reflection is available in this demo so you can explore the reading experience without creating an account.</p>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      </div>
+    </div>
+  );
+}
+
 export default function Newsletter() {
   const { user } = useAuth({
     redirectOnUnauthenticated: true,
@@ -58,8 +123,9 @@ export default function Newsletter() {
   const [expanded, setExpanded] = useState<number | null>(null);
   const [reading, setReading] = useState<Issue | null>(null);
 
-  const statusQuery = trpc.newsletter.getStatus.useQuery();
-  const issuesQuery = trpc.newsletter.getIssues.useQuery({ limit: 20 });
+  const demoMode = import.meta.env.VITE_DEMO_MODE !== "false";
+  const statusQuery = trpc.newsletter.getStatus.useQuery(undefined, { enabled: !demoMode });
+  const issuesQuery = trpc.newsletter.getIssues.useQuery({ limit: 20 }, { enabled: !demoMode });
   const updateMutation = trpc.newsletter.updatePreferences.useMutation({
     onSuccess: () => {
       toast.success("Preferences saved");
@@ -67,6 +133,8 @@ export default function Newsletter() {
     },
     onError: () => toast.error("Failed to save preferences"),
   });
+
+  if (demoMode) return <GuestNewsletter />;
 
   const status = statusQuery.data as
     | { email?: string; status?: string; preferences?: Record<string, unknown> }

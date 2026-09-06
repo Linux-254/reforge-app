@@ -334,3 +334,5 @@
 - [x] Add focused regression tests for guide filtering, dimension organization, and detail-route behavior
 - [x] Fix the direct /dashboard guest route so it renders the browser-local demo instead of a protected-query loading state
 - [x] Verify /dashboard, /check-ins, /journal, and /guides render without sign-in in the public demo
+- [x] Add a browser-local no-sign-in newsletter preview and preference flow that never invokes protected newsletter procedures
+- [x] Add regression coverage for guest newsletter preference isolation and reset behavior

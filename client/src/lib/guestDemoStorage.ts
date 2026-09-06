@@ -5,6 +5,7 @@ export const GUEST_STORAGE_KEYS = {
   checkIn: "reforge-guest-checkin",
   goalStep: "reforge-guest-goal-step",
   rule: "reforge-guest-rule",
+  newsletter: "reforge-guest-newsletter",
 } as const;
 
 function getStorage(): Storage | null {
@@ -34,6 +35,41 @@ export function readGuestBoolean(key: keyof Pick<typeof GUEST_STORAGE_KEYS, "che
 
 export function writeGuestBoolean(key: keyof Pick<typeof GUEST_STORAGE_KEYS, "checkIn" | "goalStep" | "rule">, value: boolean) {
   getStorage()?.setItem(GUEST_STORAGE_KEYS[key], String(value));
+}
+
+export type GuestNewsletterPreferences = {
+  subscribed: boolean;
+  daily: boolean;
+  weekly: boolean;
+  milestones: boolean;
+};
+
+const DEFAULT_NEWSLETTER_PREFERENCES: GuestNewsletterPreferences = {
+  subscribed: false,
+  daily: true,
+  weekly: true,
+  milestones: true,
+};
+
+export function readGuestNewsletterPreferences(): GuestNewsletterPreferences {
+  const storage = getStorage();
+  if (!storage) return DEFAULT_NEWSLETTER_PREFERENCES;
+  try {
+    const parsed = JSON.parse(storage.getItem(GUEST_STORAGE_KEYS.newsletter) ?? "null");
+    if (!parsed || typeof parsed !== "object") return DEFAULT_NEWSLETTER_PREFERENCES;
+    return {
+      subscribed: parsed.subscribed === true,
+      daily: parsed.daily !== false,
+      weekly: parsed.weekly !== false,
+      milestones: parsed.milestones !== false,
+    };
+  } catch {
+    return DEFAULT_NEWSLETTER_PREFERENCES;
+  }
+}
+
+export function writeGuestNewsletterPreferences(preferences: GuestNewsletterPreferences) {
+  getStorage()?.setItem(GUEST_STORAGE_KEYS.newsletter, JSON.stringify(preferences));
 }
 
 export function clearGuestDemoData() {
