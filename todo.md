@@ -230,7 +230,7 @@
 - [ ] Rework authenticated shell, navigation, dashboard, and all recovery workspace pages with contextual nature cues
 - [ ] Add responsive and reduced-motion polish for the nature redesign
 - [ ] Validate the redesign with type checks, tests, production build, and screenshots
-- [ ] Reconcile PostgreSQL schema fields with backend helpers and tRPC client contracts so the full-stack build compiles cleanly
+- [x] Reconcile PostgreSQL schema fields with backend helpers and tRPC client contracts so the full-stack build compiles cleanly; validated by TypeScript, Vitest, and production build
 - [ ] Finish nature-led redesign for dashboard, settings, newsletter, and onboarding routes
 - [ ] Diagnose and repair OAuth callback failure in server/_core/oauth.ts or session cookie configuration
 - [x] Implement a restorative loading spinner and overlay on the frontend while OAuth handoff and session verification are processing
@@ -348,3 +348,4 @@
 - [x] Audit the authenticated shell and each recovery workspace page for consistent nature-led treatment without claiming unavailable sign-in verification
 - [x] Add and document prefers-reduced-motion coverage for redesign animations
 - [x] Keep redesign validation scoped to the surfaces actually covered by tests, builds, and screenshots until authenticated route verification is available
+- [x] Document the OAuth callback failure trace and distinguish application checks from the observed database TLS connection failure
