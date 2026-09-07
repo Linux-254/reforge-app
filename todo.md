@@ -223,10 +223,10 @@
 - [x] Tailwind CSS configuration
 - [x] TypeScript setup
 - [x] Fix TRPCClientError: db.getSubstanceFocus is not a function on the dashboard route; the helper is exported and the dashboard contract now compiles cleanly
-- [ ] Redesign ReForge UI/UX around a nature-led restorative visual language
-- [ ] Replace autumn-only surfaces with botanical earth, moss, clay, mist, and forest tokens
+- [x] Redesign ReForge UI/UX around a nature-led restorative visual language
+- [x] Replace autumn-only surfaces with botanical earth, moss, clay, mist, and forest tokens
 - [ ] Create and upload nature-led page atmosphere assets for public, sign-in, dashboard, journal, check-in, goals, guides, music, rules, newsletter, and settings
-- [ ] Rebuild public landing and sign-in composition with nature imagery, calm motion, and accessible controls
+- [x] Rebuild public landing and sign-in composition with nature imagery, calm motion, and accessible controls
 - [ ] Rework authenticated shell, navigation, dashboard, and all recovery workspace pages with contextual nature cues
 - [ ] Add responsive and reduced-motion polish for the nature redesign
 - [ ] Validate the redesign with type checks, tests, production build, and screenshots
@@ -344,3 +344,7 @@
 - [x] Re-run the full Vitest suite, TypeScript check, production build, and ZIP integrity validation after the archive refresh
 - [x] Add a browser-local community circle demo with disclosure, peer-style prompts, and local post persistence without shared anonymous backend writes
 - [x] Document the Community Circle demo route, local-only post behavior, and privacy boundary in open-source guidance
+- [x] Verify and document route-by-route nature asset usage for journal, check-ins, goals, music, rules, newsletter, and settings
+- [x] Audit the authenticated shell and each recovery workspace page for consistent nature-led treatment without claiming unavailable sign-in verification
+- [x] Add and document prefers-reduced-motion coverage for redesign animations
+- [x] Keep redesign validation scoped to the surfaces actually covered by tests, builds, and screenshots until authenticated route verification is available
