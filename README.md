@@ -15,6 +15,7 @@ The current public preview runs in **no-sign-in demo mode**. Visitors can open t
 | Goals | A 30-day example goal with a locally persisted next step |
 | Boundaries | A daily boundary review with a local completion state |
 | Guides | Practical recovery prompts and reflection entry points |
+| Community Circle | Prompt-based peer-style notes with topic filters, stored only in this browser |
 | Settings | Privacy explanation and one-click local demo reset |
 
 The full-stack implementation remains in the repository. Its protected tRPC procedures, PostgreSQL/Drizzle schema, ownership checks, field-level encryption, Manus authentication, and staged Supabase authentication path are retained for a future authenticated build. Guest demo mode deliberately does not invoke those protected procedures.
@@ -44,7 +45,7 @@ Useful commands are shown below.
 
 > **The no-sign-in mode is a product demo, not a secure personal account.** Do not enter real names, clinical details, crisis disclosures, treatment records, or other sensitive information into a public demo deployment.
 
-The demo uses browser-local storage under ReForge-specific keys and includes a reset action in Settings. Clearing the site's browser data also clears the demo state for that browser. Because no account is established, demo data cannot be recovered across devices and is not available to another browser profile.
+The demo uses browser-local storage under ReForge-specific keys, including a separate Community Circle namespace, and includes a reset action in Settings. Clearing the site's browser data also clears the demo state for that browser. Because no account is established, demo data cannot be recovered across devices and is not available to another browser profile.
 
 The server-side encrypted workflows remain protected rather than being weakened for anonymous access. This is intentional: anonymous shared persistence would not provide a trustworthy ownership boundary for journals, check-ins, assessment responses, goals, or rule reviews.
 
