@@ -222,7 +222,7 @@
 - [x] UI component library setup
 - [x] Tailwind CSS configuration
 - [x] TypeScript setup
-- [ ] Fix TRPCClientError: db.getSubstanceFocus is not a function on the dashboard route
+- [x] Fix TRPCClientError: db.getSubstanceFocus is not a function on the dashboard route; the helper is exported and the dashboard contract now compiles cleanly
 - [ ] Redesign ReForge UI/UX around a nature-led restorative visual language
 - [ ] Replace autumn-only surfaces with botanical earth, moss, clay, mist, and forest tokens
 - [ ] Create and upload nature-led page atmosphere assets for public, sign-in, dashboard, journal, check-in, goals, guides, music, rules, newsletter, and settings
