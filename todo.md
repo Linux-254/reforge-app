@@ -342,3 +342,4 @@
 - [ ] Complete full responsive verification for every authenticated route after sign-in is available
 - [x] Exclude internal checkpoint metadata, build output, dependencies, and environment files from the downloadable source archive
 - [x] Re-run the full Vitest suite, TypeScript check, production build, and ZIP integrity validation after the archive refresh
+- [x] Add a browser-local community circle demo with disclosure, peer-style prompts, and local post persistence without shared anonymous backend writes

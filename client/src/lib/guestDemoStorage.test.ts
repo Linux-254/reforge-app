@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { clearGuestDemoData, GUEST_STORAGE_KEYS, readGuestBoolean, readGuestJournal, readGuestNewsletterPreferences, writeGuestBoolean, writeGuestJournal, writeGuestNewsletterPreferences } from "./guestDemoStorage";
+import { clearGuestDemoData, GUEST_STORAGE_KEYS, readGuestBoolean, readGuestJournal, readGuestNewsletterPreferences, readGuestCommunityPosts, writeGuestBoolean, writeGuestJournal, writeGuestNewsletterPreferences, writeGuestCommunityPosts } from "./guestDemoStorage";
 
 const originalStorage = globalThis.localStorage;
 
@@ -28,6 +28,18 @@ describe("guest demo storage", () => {
     writeGuestJournal(entries);
     expect(readGuestJournal()).toEqual(entries);
     expect(localStorage.getItem("unrelated-site-key")).toBeNull();
+  });
+
+  it("round-trips community posts, filters malformed entries, and resets them with the guest namespace", () => {
+    installMemoryStorage();
+    const posts = [{ id: 1, body: "A small honest step", topic: "Courage", createdAt: "2026-09-06T00:00:00.000Z" }];
+    writeGuestCommunityPosts(posts);
+    expect(readGuestCommunityPosts()).toEqual(posts);
+    localStorage.setItem(GUEST_STORAGE_KEYS.community, JSON.stringify([{ id: "bad", body: "ignore", topic: "Courage", createdAt: "now" }]));
+    expect(readGuestCommunityPosts()).toEqual([]);
+    writeGuestCommunityPosts([{ id: 2, body: "Keep going", topic: "Repair", createdAt: "2026-09-06T00:00:00.000Z" }]);
+    clearGuestDemoData();
+    expect(readGuestCommunityPosts()).toEqual([]);
   });
 
   it("round-trips newsletter preferences and resets them with the guest namespace", () => {

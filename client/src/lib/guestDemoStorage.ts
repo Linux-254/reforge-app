@@ -1,4 +1,5 @@
 export type GuestJournalEntry = { id: number; body: string; createdAt: string };
+export type GuestCommunityPost = { id: number; body: string; createdAt: string; topic: string };
 
 export const GUEST_STORAGE_KEYS = {
   journal: "reforge-guest-journal",
@@ -6,6 +7,7 @@ export const GUEST_STORAGE_KEYS = {
   goalStep: "reforge-guest-goal-step",
   rule: "reforge-guest-rule",
   newsletter: "reforge-guest-newsletter",
+  community: "reforge-guest-community",
 } as const;
 
 function getStorage(): Storage | null {
@@ -44,12 +46,7 @@ export type GuestNewsletterPreferences = {
   milestones: boolean;
 };
 
-const DEFAULT_NEWSLETTER_PREFERENCES: GuestNewsletterPreferences = {
-  subscribed: false,
-  daily: true,
-  weekly: true,
-  milestones: true,
-};
+const DEFAULT_NEWSLETTER_PREFERENCES: GuestNewsletterPreferences = { subscribed: false, daily: true, weekly: true, milestones: true };
 
 export function readGuestNewsletterPreferences(): GuestNewsletterPreferences {
   const storage = getStorage();
@@ -57,12 +54,7 @@ export function readGuestNewsletterPreferences(): GuestNewsletterPreferences {
   try {
     const parsed = JSON.parse(storage.getItem(GUEST_STORAGE_KEYS.newsletter) ?? "null");
     if (!parsed || typeof parsed !== "object") return DEFAULT_NEWSLETTER_PREFERENCES;
-    return {
-      subscribed: parsed.subscribed === true,
-      daily: parsed.daily !== false,
-      weekly: parsed.weekly !== false,
-      milestones: parsed.milestones !== false,
-    };
+    return { subscribed: parsed.subscribed === true, daily: parsed.daily !== false, weekly: parsed.weekly !== false, milestones: parsed.milestones !== false };
   } catch {
     return DEFAULT_NEWSLETTER_PREFERENCES;
   }
@@ -70,6 +62,21 @@ export function readGuestNewsletterPreferences(): GuestNewsletterPreferences {
 
 export function writeGuestNewsletterPreferences(preferences: GuestNewsletterPreferences) {
   getStorage()?.setItem(GUEST_STORAGE_KEYS.newsletter, JSON.stringify(preferences));
+}
+
+export function readGuestCommunityPosts(): GuestCommunityPost[] {
+  const storage = getStorage();
+  if (!storage) return [];
+  try {
+    const parsed = JSON.parse(storage.getItem(GUEST_STORAGE_KEYS.community) ?? "[]");
+    return Array.isArray(parsed) ? parsed.filter((post): post is GuestCommunityPost => Boolean(post && typeof post.body === "string" && typeof post.createdAt === "string" && typeof post.topic === "string" && typeof post.id === "number")) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function writeGuestCommunityPosts(posts: GuestCommunityPost[]) {
+  getStorage()?.setItem(GUEST_STORAGE_KEYS.community, JSON.stringify(posts));
 }
 
 export function clearGuestDemoData() {

@@ -23,6 +23,7 @@ import { NewsletterPage } from "@/pages/AdditionalFeatures";
 import RulesPage from "@/pages/Rules";
 import { GoalsPage, JournalPage, MusicPage, ProgressPage } from "@/pages/RecoveryWorkspace";
 import Guides from "@/pages/Guides";
+import Community from "@/pages/Community";
 import Settings from "@/pages/Settings";
 import OnboardingPage from "@/pages/Onboarding";
 import { Route, Switch } from "wouter";
@@ -54,6 +55,7 @@ function Router() {
       <Route path={"/rules"} component={RulesPage} />
       <Route path={"/goals"} component={GoalsPage} />
       <Route path={"/guides"} component={Guides} />
+      <Route path={"/community"} component={Community} />
       <Route path={"/music"} component={MusicPage} />
       <Route path={"/devotional"} component={Devotional} />
       <Route path={"/newsletter"} component={NewsletterPage} />

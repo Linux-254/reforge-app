@@ -6,9 +6,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { BookOpen, Check, Compass, FileHeart, Goal, HeartPulse, Home, Leaf, LockKeyhole, LogOut, Menu, Music2, Save, Settings, ShieldCheck, Sparkles, Target, TrendingUp, X } from "lucide-react";
+import { BookOpen, Check, Compass, FileHeart, Goal, HeartPulse, Home, Leaf, LockKeyhole, LogOut, Menu, Music2, Save, Settings, ShieldCheck, Sparkles, Target, TrendingUp, Users, X } from "lucide-react";
 import { clearGuestDemoData, readGuestBoolean, readGuestJournal, writeGuestBoolean, writeGuestJournal, type GuestJournalEntry } from "@/lib/guestDemoStorage";
 import Guides from "@/pages/Guides";
+import Community from "@/pages/Community";
 
 const navItems = [
   { path: "/dashboard", label: "Overview", icon: Home },
@@ -18,6 +19,7 @@ const navItems = [
   { path: "/goals", label: "Goals", icon: Goal },
   { path: "/rules", label: "Boundaries", icon: ShieldCheck },
   { path: "/guides", label: "Guides", icon: Compass },
+  { path: "/community", label: "Community", icon: Users },
   { path: "/music", label: "Music reset", icon: Music2 },
   { path: "/devotional", label: "Devotional", icon: Sparkles },
   { path: "/newsletter", label: "Newsletter", icon: FileHeart },
@@ -48,6 +50,7 @@ function DemoContent({ path, notify }: { path: string; notify: (message: string)
   if (path === "/goals") return <Page title="Goals that can hold you" description="Choose one horizon and make the next step visible."><Card className="nature-card"><CardHeader><Badge className="w-fit rounded-full bg-primary/10 text-primary hover:bg-primary/10">30-day horizon</Badge><CardTitle className="font-serif text-3xl">Return to a steadier morning</CardTitle><CardDescription>One gentle structure that supports the rest of the day.</CardDescription></CardHeader><CardContent><button type="button" onClick={() => { setGoalStep(!goalStep); writeGuestBoolean("goalStep", !goalStep); }} className="flex w-full items-center gap-3 rounded-xl border p-4 text-left hover:border-primary/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><span className={`grid h-7 w-7 place-items-center rounded-full ${goalStep ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{goalStep ? <Check className="h-4 w-4" /> : "1"}</span><span><strong className="block">Prepare tomorrow tonight</strong><span className="text-sm text-muted-foreground">Tap to mark this demo step complete.</span></span></button></CardContent></Card></Page>;
   if (path === "/rules") return <Page title="Boundaries that protect the life you want" description="Practice one clear rule at a time, without shame or perfectionism."><Card className="nature-card"><CardHeader><Badge variant="outline" className="w-fit rounded-full">Daily review</Badge><CardTitle className="font-serif text-3xl">I do not make big decisions while overwhelmed.</CardTitle><CardDescription>Pause, regulate, and return to the decision with support.</CardDescription></CardHeader><CardContent><Button onClick={() => { setRuleKept(!ruleKept); writeGuestBoolean("rule", !ruleKept); notify(!ruleKept ? "Boundary marked as kept." : "Boundary review reopened."); }} className="rounded-full">{ruleKept ? "Reviewed today" : "Mark reviewed"}</Button></CardContent></Card></Page>;
   if (path === "/guides") return <Guides />;
+  if (path === "/community") return <Community />;
   if (path === "/settings") return <Page title="Settings and privacy" description="Guest mode keeps this demo local to your browser."><Card className="nature-card"><CardContent className="space-y-4 p-6"><div className="flex items-start gap-3"><LockKeyhole className="mt-1 h-5 w-5 text-primary" /><p className="text-sm leading-7">No account, cookie session, or cloud profile is required in this demo. Clear this browser's site data to remove local demo entries.</p></div><Button variant="outline" onClick={() => { clearGuestDemoData(); window.location.reload(); }} className="rounded-full">Reset local demo</Button></CardContent></Card></Page>;
   return <Page title="A quiet place to begin again" description="Explore ReForge without an account. Your demo actions stay in this browser."><div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><Metric label="Today" value={checkedIn ? "Saved" : "Open"} /><Metric label="Journal" value={`${entries.length} pages`} /><Metric label="Goal" value={goalStep ? "Moving" : "Ready"} /><Metric label="Boundary" value={ruleKept ? "Kept" : "Review"} /></div><Card className="nature-card"><CardContent className="flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-serif text-2xl">Keep the next step small.</p><p className="mt-2 text-sm leading-6 text-muted-foreground">Start with a check-in, write one honest line, or browse a practical guide.</p></div><Button onClick={() => setLocation("/check-ins")} className="rounded-full">Open today</Button></CardContent></Card></Page>;
 }
