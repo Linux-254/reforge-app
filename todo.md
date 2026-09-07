@@ -272,7 +272,7 @@
 - [x] Replace misleading hardcoded goal progress with real progress or a clearly non-progress presentation
 - [x] Surface upcoming-goal information with an honest next-step or horizon summary
 - [x] Replace the goals workspace hardcoded progress bar with real step completion data
-- [ ] Verify all public marketing pages at 375px, 768px, and 1440px and document route findings
+- [x] Verify all public marketing pages at 375px, 768px, and 1440px and document route findings
 - [ ] Verify protected routes at 375px, 768px, and 1440px and document route findings
 
 ## Supabase Auth migration preparation

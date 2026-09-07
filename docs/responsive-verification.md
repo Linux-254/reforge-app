@@ -11,3 +11,9 @@ The public routes `/`, `/about`, `/how-it-works`, `/dimensions`, `/daily-practic
 ## Public route tablet sweep — 768px
 
 The same eight public routes were captured at 768×1024. Editorial layouts use readable two-column cards where appropriate, the compact navigation rail wraps without clipping, hero actions remain comfortably sized, and footer columns remain legible. Long pages preserve vertical rhythm without horizontal overflow.
+
+## Expanded public-route sweep — 2026-09-07
+
+The public marketing and entry routes were additionally reviewed at 1440×900 and the remaining routes were checked at 375×812, 768×1024, and 1440×900: `/`, `/about`, `/how-it-works`, `/dimensions`, `/daily-practice`, `/success`, `/faq`, `/supporters`, `/contact`, `/sign-in`, `/privacy`, `/terms`, and `/community`.
+
+The reviewed routes retained readable typography, wrapped navigation controls without horizontal clipping, and kept primary actions within the viewport. The Community Circle composer and topic filters remained usable at tablet width; the sign-in route preserved the no-account demo call to action. Authenticated-only routes remain intentionally unverified until a controlled sign-in session is available.
