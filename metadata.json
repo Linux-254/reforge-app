@@ -1,0 +1,6 @@
+{
+  "name": "ReForge - Sober Lifestyle Platform",
+  "description": "Comprehensive sobriety and recovery lifestyle platform featuring daily check-ins, journal, life dimensions, rules and boundaries, goals, and community support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

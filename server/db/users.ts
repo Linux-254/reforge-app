@@ -1,0 +1,217 @@
+import { eq, and, inArray } from "drizzle-orm";
+import { authIdentities, users, userRoles, InsertUser } from "../../drizzle/schema";
+import { ENV } from "../_core/env";
+import { getDb } from "./client";
+
+export async function upsertUser(user: InsertUser): Promise<void> {
+  if (!user.openId) {
+    throw new Error("User openId is required for upsert");
+  }
+
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot upsert user: database not available");
+    return;
+  }
+
+  try {
+    const values: InsertUser = {
+      openId: user.openId,
+    };
+    const updateSet: Record<string, unknown> = {};
+
+    const textFields = ["name", "email", "loginMethod"] as const;
+    type TextField = (typeof textFields)[number];
+
+    const assignNullable = (field: TextField) => {
+      const value = user[field];
+      if (value === undefined) return;
+      const normalized = value ?? null;
+      values[field] = normalized;
+      updateSet[field] = normalized;
+    };
+
+    textFields.forEach(assignNullable);
+
+    if (user.lastSignedIn !== undefined) {
+      values.lastSignedIn = user.lastSignedIn;
+      updateSet.lastSignedIn = user.lastSignedIn;
+    }
+    if (user.role !== undefined) {
+      values.role = user.role;
+      updateSet.role = user.role;
+    } else if (user.openId === ENV.ownerOpenId) {
+      values.role = "admin";
+      updateSet.role = "admin";
+    }
+
+    if (!values.lastSignedIn) {
+      values.lastSignedIn = new Date();
+    }
+
+    if (Object.keys(updateSet).length === 0) {
+      updateSet.lastSignedIn = new Date();
+    }
+
+    await db.insert(users).values(values).onConflictDoUpdate({
+      target: users.openId,
+      set: updateSet,
+    });
+  } catch (error) {
+    console.error("[Database] Failed to upsert user:", error);
+    throw error;
+  }
+}
+
+export async function getUserByOpenId(openId: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user: database not available");
+    return undefined;
+  }
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(eq(users.openId, openId))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByEmail(email: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.email, email)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserByAuthIdentity(provider: string, subject: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db
+    .select({ user: users })
+    .from(authIdentities)
+    .innerJoin(users, eq(authIdentities.userId, users.id))
+    .where(and(eq(authIdentities.provider, provider), eq(authIdentities.subject, subject)))
+    .limit(1);
+  return result.length > 0 ? result[0].user : undefined;
+}
+
+export async function createAuthIdentity(userId: number, provider: string, subject: string) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  await db
+    .insert(authIdentities)
+    .values({ userId, provider, subject })
+    .onConflictDoNothing();
+  const result = await db
+    .select()
+    .from(authIdentities)
+    .where(and(eq(authIdentities.provider, provider), eq(authIdentities.subject, subject)))
+    .limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+/**
+ * Backward-compatible name retained for staged-auth callers that predate the
+ * createAuthIdentity terminology. It delegates to the same unique mapping
+ * operation, so a provider subject cannot be linked to a second identity.
+ */
+export async function linkUserToExternalIdentity(userId: number, provider: string, subject: string) {
+  if (!provider.trim() || !subject.trim()) throw new Error("External identity provider and subject are required");
+  return createAuthIdentity(userId, provider.trim(), subject.trim());
+}
+
+export async function getUserById(id: number) {
+  const db = await getDb();
+  if (!db) return undefined;
+
+  const result = await db.select().from(users).where(eq(users.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function getUserRoles(userId: number): Promise<string[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select()
+    .from(userRoles)
+    .where(eq(userRoles.userId, userId));
+  return rows.map(row => row.role);
+}
+
+export async function listUsers(limit = 50, offset = 0) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const rows = await db
+    .select({
+      id: users.id,
+      openId: users.openId,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+      createdAt: users.createdAt,
+      lastSignedIn: users.lastSignedIn,
+    })
+    .from(users)
+    .limit(limit)
+    .offset(offset);
+
+  const ids = rows.map(r => r.id);
+  if (ids.length === 0) return [];
+
+  const roleRows = await db
+    .select({ userId: userRoles.userId, role: userRoles.role })
+    .from(userRoles)
+    .where(inArray(userRoles.userId, ids));
+
+  const rolesByUser = new Map<number, string[]>();
+  for (const row of roleRows) {
+    const list = rolesByUser.get(row.userId) ?? [];
+    list.push(row.role);
+    rolesByUser.set(row.userId, list);
+  }
+
+  return rows.map(r => ({
+    ...r,
+    roles: rolesByUser.get(r.id) ?? [],
+  }));
+}
+
+export async function grantUserRole(userId: number, role: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  const existing = await db
+    .select()
+    .from(userRoles)
+    .where(eq(userRoles.userId, userId))
+    .limit(1);
+
+  const hasRole = existing.some(row => row.role === role);
+  if (hasRole) return;
+
+  await db.insert(userRoles).values({
+    userId,
+    role: role as (typeof userRoles.$inferInsert)["role"],
+  });
+}
+
+export async function revokeUserRole(userId: number, role: string) {
+  const db = await getDb();
+  if (!db) return;
+
+  await db
+    .delete(userRoles)
+    .where(
+      and(
+        eq(userRoles.userId, userId),
+        eq(userRoles.role, role as (typeof userRoles.$inferInsert)["role"])
+      )
+    );
+}

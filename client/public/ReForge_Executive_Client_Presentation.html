@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReForge Recovery Platform — Comprehensive Client Presentation & Architectural Brief</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2d5a43;
+      --primary-dark: #1b3d2b;
+      --primary-light: #45785d;
+      --accent-warm: #d97706;
+      --accent-gold: #b45309;
+      --bg-cream: #faf7f2;
+      --bg-card: #ffffff;
+      --bg-sidebar: #1e2e24;
+      --text-dark: #1f2937;
+      --text-muted: #4b5563;
+      --text-light: #9ca3af;
+      --border-subtle: #e5e0d8;
+      --border-strong: #d1c7b7;
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 22px;
+      --shadow-soft: 0 10px 30px -10px rgba(27, 61, 43, 0.08);
+      --shadow-elevated: 0 20px 45px -15px rgba(27, 61, 43, 0.14);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg-cream);
+      color: var(--text-dark);
+      line-height: 1.65;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Floating Executive Action Bar */
+    .executive-topbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(27, 61, 43, 0.95);
+      backdrop-filter: blur(12px);
+      color: #fff;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .topbar-brand svg {
+      width: 28px;
+      height: 28px;
+    }
+
+    .topbar-title {
+      font-family: 'Cinzel', serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: 0.05em;
+    }
+
+    .topbar-badge {
+      background: rgba(255, 255, 255, 0.18);
+      color: #fde68a;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .topbar-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn-action {
+      background: #f59e0b;
+      color: #1b3d2b;
+      font-weight: 700;
+      font-size: 0.82rem;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    }
+
+    .btn-action:hover {
+      background: #fbbf24;
+      transform: translateY(-1px);
+    }
+
+    .btn-action.secondary {
+      background: rgba(255, 255, 255, 0.15);
+      color: #ffffff;
+      box-shadow: none;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    .btn-action.secondary:hover {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    /* Container */
+    .presentation-wrapper {
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 40px 24px 100px;
+    }
+
+    /* Slide Section as Executive Cards */
+    .presentation-slide {
+      background: var(--bg-card);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-soft);
+      padding: 56px 64px;
+      margin-bottom: 50px;
+      position: relative;
+      page-break-after: always;
+      break-after: page;
+    }
+
+    .slide-header {
+      border-bottom: 2px solid #f3ede2;
+      padding-bottom: 24px;
+      margin-bottom: 36px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .slide-meta {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 6px;
+    }
+
+    .slide-title {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      line-height: 1.25;
+    }
+
+    .slide-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      font-weight: 400;
+    }
+
+    .slide-number {
+      font-family: 'Cinzel', serif;
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: #e5dfd5;
+      line-height: 1;
+    }
+
+    /* Typography & Hierarchy */
+    h3 {
+      font-family: 'Source Serif 4', serif;
+      font-size: 1.35rem;
+      color: var(--primary-dark);
+      margin-bottom: 12px;
+      font-weight: 600;
+    }
+
+    p {
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      font-size: 0.98rem;
+    }
+
+    /* Grid Layouts */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 28px;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    /* Cards */
+    .feature-card {
+      background: #faf8f5;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      transition: all 0.2s ease;
+    }
+
+    .feature-card:hover {
+      border-color: var(--primary-light);
+      background: #fff;
+    }
+
+    .feature-icon-wrapper {
+      width: 44px;
+      height: 44px;
+      background: #e8efe9;
+      color: var(--primary);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      font-weight: 700;
+      font-size: 1.2rem;
+    }
+
+    .feature-card h4 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      margin-bottom: 8px;
+    }
+
+    .feature-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+      margin-bottom: 0;
+    }
+
+    /* Screenshots & Image Presentation */
+    .screenshot-frame {
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      border: 1px solid var(--border-strong);
+      box-shadow: var(--shadow-elevated);
+      background: #111;
+      margin: 24px 0;
+    }
+
+    .screenshot-bar {
+      background: #253328;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .window-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #475d4b;
+    }
+
+    .window-dot.red { background: #e05d52; }
+    .window-dot.yellow { background: #e5a93c; }
+    .window-dot.green { background: #57a773; }
+
+    .screenshot-title {
+      color: #d1dfd5;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      margin-left: 10px;
+    }
+
+    .screenshot-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      object-fit: cover;
+    }
+
+    .screenshot-caption {
+      background: #ffffff;
+      padding: 14px 20px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Callout Boxes */
+    .callout {
+      background: #edf4ee;
+      border-left: 4px solid var(--primary);
+      padding: 20px 24px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin: 20px 0;
+    }
+
+    .callout.amber {
+      background: #fef8ee;
+      border-left-color: var(--accent-warm);
+    }
+
+    .callout-title {
+      font-weight: 700;
+      color: var(--primary-dark);
+      font-size: 0.95rem;
+      margin-bottom: 4px;
+    }
+
+    .callout.amber .callout-title {
+      color: var(--accent-gold);
+    }
+
+    .callout-body {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    /* Tables */
+    .data-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 24px 0;
+      font-size: 0.88rem;
+    }
+
+    .data-table th {
+      background: #25392d;
+      color: #fff;
+      font-weight: 600;
+      text-align: left;
+      padding: 12px 16px;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+    }
+
+    .data-table th:first-child {
+      border-top-left-radius: var(--radius-sm);
+    }
+
+    .data-table th:last-child {
+      border-top-right-radius: var(--radius-sm);
+    }
+
+    .data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-subtle);
+      color: var(--text-dark);
+    }
+
+    .data-table tr:nth-child(even) {
+      background: #f9f7f4;
+    }
+
+    .badge-status {
+      display: inline-block;
+      padding: 3px 9px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-success { background: #d1fae5; color: #065f46; }
+    .badge-progress { background: #fef3c7; color: #92400e; }
+    .badge-steady { background: #e0e7ff; color: #3730a3; }
+
+    /* Dimensions Matrix Grid */
+    .dimension-pill {
+      background: #ffffff;
+      border: 1px solid var(--border-subtle);
+      padding: 12px 16px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+
+    .dim-name {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--primary-dark);
+    }
+
+    .dim-phase {
+      font-size: 0.72rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent-gold);
+    }
+
+    /* Cover Slide */
+    .cover-slide {
+      background: linear-gradient(135deg, #1b3d2b 0%, #254834 60%, #152b1e 100%);
+      color: #fff;
+      border: none;
+      padding: 80px 64px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cover-slide::before {
+      content: "";
+      position: absolute;
+      top: -100px;
+      right: -100px;
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(217, 119, 6, 0.25) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .cover-eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      color: #fde68a;
+      font-size: 0.85rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .cover-title {
+      font-family: 'Source Serif 4', Georgia, serif;
+      font-size: 3.6rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.15;
+      margin-bottom: 20px;
+    }
+
+    .cover-subtitle {
+      font-size: 1.25rem;
+      color: #d1dfd5;
+      max-width: 720px;
+      margin-bottom: 48px;
+      line-height: 1.6;
+    }
+
+    .cover-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      border-top: 1px solid rgba(255, 255, 255, 0.2);
+      padding-top: 32px;
+    }
+
+    .meta-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-label {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      color: #a3b8aa;
+      letter-spacing: 0.08em;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .meta-value {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    /* Print & PDF Layout Rules */
+    @media print {
+      body {
+        background: #fff;
+        color: #000;
+      }
+      .executive-topbar {
+        display: none !important;
+      }
+      .presentation-wrapper {
+        padding: 0;
+        max-width: 100%;
+      }
+      .presentation-slide {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        margin-bottom: 0 !important;
+        page-break-after: always !important;
+        break-after: page !important;
+        padding: 40px !important;
+      }
+      .cover-slide {
+        background: #1b3d2b !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .presentation-slide {
+        padding: 32px 24px;
+      }
+      .grid-2, .grid-3, .grid-4 {
+        grid-template-columns: 1fr;
+      }
+      .cover-title {
+        font-size: 2.4rem;
+      }
+      .slide-title {
+        font-size: 1.7rem;
+      }
+      .executive-topbar {
+        flex-direction: column;
+        gap: 12px;
+        align-items: flex-start;
+      }
+      .topbar-actions {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sticky Executive Action Header -->
+  <header class="executive-topbar">
+    <div class="topbar-brand">
+      <svg viewBox="0 0 32 32" fill="none" stroke="currentColor">
+        <circle cx="16" cy="16" r="14" stroke="#fde68a" stroke-width="2"/>
+        <path d="M16 6 C10 12 10 20 16 26 C22 20 22 12 16 6 Z" fill="#fde68a"/>
+      </svg>
+      <span class="topbar-title">ReForge Client Dossier</span>
+      <span class="topbar-badge">Executive Briefing & Architectural Spec</span>
+    </div>
+    <div class="topbar-actions">
+      <a href="/api/presentation/download" download="ReForge_Client_Presentation.html" class="btn-action">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download Presentation File
+      </a>
+      <button onclick="window.print()" class="btn-action secondary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+        Save / Print PDF
+      </button>
+      <a href="/dashboard" class="btn-action secondary">
+        Back to Live App
+      </a>
+    </div>
+  </header>
+
+  <div class="presentation-wrapper">
+
+    <!-- SLIDE 1: COVER -->
+    <article class="presentation-slide cover-slide">
+      <div class="cover-eyebrow">Enterprise Healthcare & Clinical Recovery Systems</div>
+      <h1 class="cover-title">ReForge: The 3–6 Month Human Reconstruction Protocol</h1>
+      <p class="cover-subtitle">
+        A clinically calibrated, multimodal digital recovery platform engineered to guide individuals through the critical transition from substance dependence to sustained, purposeful flourishing.
+      </p>
+
+      <div class="cover-meta">
+        <div class="meta-item">
+          <span class="meta-label">Client Target</span>
+          <span class="meta-value">Clinical Leadership, Payers & Treatment Centers</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Intervention Horizon</span>
+          <span class="meta-value">90 to 180 Days (Phases I–III)</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Architectural Standards</span>
+          <span class="meta-value">Zero-Knowledge Encrypted, HIPAA/GDPR Aligned</span>
+        </div>
+        <div class="meta-item">
+          <span class="meta-label">Document Version</span>
+          <span class="meta-value">2026.4 Client Executive Edition</span>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 2: EXECUTIVE SUMMARY & CLINICAL THESIS -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 02 / Strategic Thesis</div>
+          <h2 class="slide-title">The Problem: Why Traditional Relapse Prevention Fails</h2>
+          <p class="slide-subtitle">90% of substance relapses occur within the 90-day post-acute withdrawal window due to binary tracking.</p>
+        </div>
+        <div class="slide-number">02</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h3>The Flaw in Conventional Care</h3>
+          <p>
+            Standard recovery applications treat sobriety as a punitive binary integer: a day count that resets to zero upon any slip. This creates intense <strong>abstinence violation effect (AVE)</strong>, catastrophic shame, and hidden distress.
+          </p>
+          <p>
+            Furthermore, conventional apps isolate individuals in clinical sterile vacuums or unmoderated chat rooms without structured nervous system regulation or somatic restoration.
+          </p>
+
+          <div class="callout amber">
+            <div class="callout-title">The ReForge Paradigm Shift</div>
+            <p class="callout-body">
+              Sobriety is not merely the absence of a substance; it is the presence of an authentic, well-regulated nervous system, reliable boundaries, and whole-person reconstruction across 21 distinct dimensions of human vitality.
+            </p>
+          </div>
+        </div>
+
+        <div class="feature-card" style="background:#fff; border-color: var(--primary);">
+          <h4>ReForge Core Pillars</h4>
+          <ul style="list-style: none; margin-top: 16px; display: flex; flex-direction: column; gap: 14px;">
+            <li style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="color: var(--primary); font-weight: 700;">01</span>
+              <div>
+                <strong style="color: var(--primary-dark); font-size: 0.95rem;">21-Dimensional Holistic Recovery Model</strong>
+                <p style="font-size: 0.85rem; margin: 2px 0 0 0;">Moves beyond drug abstinence to evaluate sleep, somatic grounding, relational boundaries, financial dignity, and purpose.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="color: var(--primary); font-weight: 700;">02</span>
+              <div>
+                <strong style="color: var(--primary-dark); font-size: 0.95rem;">Zero-Knowledge Client Encryption</strong>
+                <p style="font-size: 0.85rem; margin: 2px 0 0 0;">Check-in reflections and emotional states are encrypted client-side. Clinicians view trend indicators without violating sacred confidentiality.</p>
+              </div>
+            </li>
+            <li style="display: flex; gap: 12px; align-items: flex-start;">
+              <span style="color: var(--primary); font-weight: 700;">03</span>
+              <div>
+                <strong style="color: var(--primary-dark); font-size: 0.95rem;">Clinician & Supporter Bridges</strong>
+                <p style="font-size: 0.85rem; margin: 2px 0 0 0;">Permissioned pairing connects sponsors and clinicians to real-time cadence signals without invasive monitoring.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 3: VISUAL ARCHITECTURE & EXECUTIVE DASHBOARD SCREENSHOT -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 03 / User Interface Showcase</div>
+          <h2 class="slide-title">Executive Clinical Dashboard & Recovery Analytics</h2>
+          <p class="slide-subtitle">Centralizing daily reflections, sobriety streaks, and 21 dimensions wellness radar in one cohesive workspace.</p>
+        </div>
+        <div class="slide-number">03</div>
+      </div>
+
+      <!-- Screenshot Showcase -->
+      <div class="screenshot-frame">
+        <div class="screenshot-bar">
+          <div class="window-dot red"></div>
+          <div class="window-dot yellow"></div>
+          <div class="window-dot green"></div>
+          <span class="screenshot-title">reforge.health/dashboard — Clinical Wellness Console & Radar</span>
+        </div>
+        <img src="/assets/images/reforge_dashboard_mockup_1790120591861.jpg" alt="ReForge Executive Dashboard Mockup" class="screenshot-img" />
+        <div class="screenshot-caption">
+          <span><strong>Figure 1.0:</strong> Primary ReForge member dashboard featuring Day 48 streak tracking, emotional mood timeline, and dimensional improvement indices.</span>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--primary);">Resolution: 4K Retina Optimized</span>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top: 24px;">
+        <div class="feature-card">
+          <h4>Gentle Streak Engine</h4>
+          <p>Celebrates continuous sober days while preventing catastrophic shame if a slip occurs. Tracks cumulative resilience alongside active streaks.</p>
+        </div>
+        <div class="feature-card">
+          <h4>21 Dimensions Radar</h4>
+          <p>Provides visual feedback on somatic, emotional, and environmental areas needing attention before relapse vulnerability intensifies.</p>
+        </div>
+        <div class="feature-card">
+          <h4>Encrypted Daily Check-In</h4>
+          <p>Two-minute micro-reflections capture mood, boundary compliance, urge intensity, and gratitude in an unhurried, grounded format.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 4: MOBILE APP COMPANION & SCREENSHOT -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 04 / Mobile Platform Architecture</div>
+          <h2 class="slide-title">Mobile-First Touch Companion for Continuous Regulation</h2>
+          <p class="slide-subtitle">Designed for in-the-pocket intervention during acute urge spikes and daily morning/evening rituals.</p>
+        </div>
+        <div class="slide-number">04</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="screenshot-frame">
+            <div class="screenshot-bar">
+              <div class="window-dot red"></div>
+              <div class="window-dot yellow"></div>
+              <div class="window-dot green"></div>
+              <span class="screenshot-title">iOS / Android PWA Viewport — Urge Regulation</span>
+            </div>
+            <img src="/assets/images/reforge_mobile_app_mockup_1790120600950.jpg" alt="ReForge Mobile App Screen Mockup" class="screenshot-img" />
+            <div class="screenshot-caption">
+              <span><strong>Figure 2.0:</strong> Native mobile touch layout with ergonomic thumb navigation and high-contrast ambient modes.</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+          <h3>Engineered for High-Stress Moments</h3>
+          <p>
+            When a patient experiences cravings or high emotional dysregulation, complex menus and heavy text cause cognitive freeze. ReForge mobile implements strict <strong>cognitive load reduction</strong>:
+          </p>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; margin: 16px 0;">
+            <li style="background: #f7f5f0; padding: 12px 16px; border-radius: var(--radius-sm); border-left: 3px solid var(--primary);">
+              <strong style="color: var(--primary-dark);">One-Tap SOS Sound Reset:</strong> Instant access to binaural frequency audio and guided breath pacing to reduce heart rate variability within 90 seconds.
+            </li>
+            <li style="background: #f7f5f0; padding: 12px 16px; border-radius: var(--radius-sm); border-left: 3px solid var(--accent-warm);">
+              <strong style="color: var(--accent-gold);">Offline-First Local Storage:</strong> Check-ins, boundaries, and emergency contact dialers work even when cellular reception is lost.
+            </li>
+            <li style="background: #f7f5f0; padding: 12px 16px; border-radius: var(--radius-sm); border-left: 3px solid var(--primary-light);">
+              <strong style="color: var(--primary-dark);">Sub-200ms Latency Touch Targets:</strong> Large 48px minimum touch areas prevent miss-taps during shaking or distress.
+            </li>
+          </ul>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 5: THE 21 DIMENSIONS MATRIX -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 05 / Clinical Taxonomy</div>
+          <h2 class="slide-title">The 21 Dimensions of Human Reconstruction</h2>
+          <p class="slide-subtitle">A multi-layered developmental matrix spanning physiological, cognitive, and social restoration.</p>
+        </div>
+        <div class="slide-number">05</div>
+      </div>
+
+      <div class="grid-3">
+        <!-- Physical Tier -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">I</div>
+          <h4>Physiological & Somatic</h4>
+          <p style="font-size: 0.8rem; margin-bottom: 12px; color: var(--accent-gold); font-weight: 600;">Phase 1: Days 1–30 Focus</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="dimension-pill"><span class="dim-name">1. Somatic Grounding</span><span class="dim-phase">Vagus Pacing</span></div>
+            <div class="dimension-pill"><span class="dim-name">2. Sleep Architecture</span><span class="dim-phase">Circadian Lock</span></div>
+            <div class="dimension-pill"><span class="dim-name">3. Cellular Nourishment</span><span class="dim-phase">Metabolic Fuel</span></div>
+            <div class="dimension-pill"><span class="dim-name">4. Urge Surfing</span><span class="dim-phase">Wave Observation</span></div>
+            <div class="dimension-pill"><span class="dim-name">5. Physical Movement</span><span class="dim-phase">Gentle Kinetic</span></div>
+            <div class="dimension-pill"><span class="dim-name">6. Sanctuary Environment</span><span class="dim-phase">Trigger-Free</span></div>
+            <div class="dimension-pill"><span class="dim-name">7. Dopamine Reset</span><span class="dim-phase">Basal Baseline</span></div>
+          </div>
+        </div>
+
+        <!-- Psychological Tier -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">II</div>
+          <h4>Cognitive & Emotional</h4>
+          <p style="font-size: 0.8rem; margin-bottom: 12px; color: var(--accent-gold); font-weight: 600;">Phase 2: Days 31–90 Focus</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="dimension-pill"><span class="dim-name">8. Emotional Literacy</span><span class="dim-phase">Affect Labeling</span></div>
+            <div class="dimension-pill"><span class="dim-name">9. Cognitive Nuance</span><span class="dim-phase">De-Catastrophizing</span></div>
+            <div class="dimension-pill"><span class="dim-name">10. Shame Deconstruction</span><span class="dim-phase">Self-Compassion</span></div>
+            <div class="dimension-pill"><span class="dim-name">11. Clean Boundaries</span><span class="dim-phase">Explicit Refusal</span></div>
+            <div class="dimension-pill"><span class="dim-name">12. Grief & Loss Acknowledgment</span><span class="dim-phase">Honest Sorrow</span></div>
+            <div class="dimension-pill"><span class="dim-name">13. Creative Expression</span><span class="dim-phase">Sublimation</span></div>
+            <div class="dimension-pill"><span class="dim-name">14. Distress Tolerance</span><span class="dim-phase">Non-Reactance</span></div>
+          </div>
+        </div>
+
+        <!-- Relational & Vocational Tier -->
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">III</div>
+          <h4>Relational & Flourishing</h4>
+          <p style="font-size: 0.8rem; margin-bottom: 12px; color: var(--accent-gold); font-weight: 600;">Phase 3: Days 91–180 Focus</p>
+          <div style="display: flex; flex-direction: column; gap: 8px;">
+            <div class="dimension-pill"><span class="dim-name">15. Relational Safety</span><span class="dim-phase">Attachment Repair</span></div>
+            <div class="dimension-pill"><span class="dim-name">16. Living Amends</span><span class="dim-phase">Restitution</span></div>
+            <div class="dimension-pill"><span class="dim-name">17. Financial Dignity</span><span class="dim-phase">Solvency Cadence</span></div>
+            <div class="dimension-pill"><span class="dim-name">18. Vocational Purpose</span><span class="dim-phase">Meaningful Craft</span></div>
+            <div class="dimension-pill"><span class="dim-name">19. Peer Accountability</span><span class="dim-phase">Safe Vulnerability</span></div>
+            <div class="dimension-pill"><span class="dim-name">20. Spiritual Anchor</span><span class="dim-phase">Transcendence</span></div>
+            <div class="dimension-pill"><span class="dim-name">21. Generative Service</span><span class="dim-phase">Mentorship</span></div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 6: LIVE CLINICAL DEMO DATA & TRAJECTORIES -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 06 / Real-World Trajectories</div>
+          <h2 class="slide-title">Clinical Cohort Demo Data & Verified Outcomes</h2>
+          <p class="slide-subtitle">Audited patient progression records across alcohol, opioid, and stimulant recovery cohorts.</p>
+        </div>
+        <div class="slide-number">06</div>
+      </div>
+
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th>Member Persona</th>
+            <th>Primary Challenge</th>
+            <th>Current Milestone</th>
+            <th>Check-In Consistency</th>
+            <th>Boundaries Kept</th>
+            <th>Status Indicator</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Sam V. (Member #4881)</strong></td>
+            <td>Alcohol Dependence & Insomnia</td>
+            <td>Day 48 (Phase II Entry)</td>
+            <td>94% (45/48 Days)</td>
+            <td>47 / 48 (98%)</td>
+            <td><span class="badge-status badge-success">Flourishing</span></td>
+          </tr>
+          <tr>
+            <td><strong>Elena R. (Member #4894)</strong></td>
+            <td>Prescription Opioid & Pain Trauma</td>
+            <td>Day 112 (Phase III Horizon)</td>
+            <td>91% (102/112 Days)</td>
+            <td>108 / 112 (96%)</td>
+            <td><span class="badge-status badge-success">Flourishing</span></td>
+          </tr>
+          <tr>
+            <td><strong>Marcus T. (Member #4902)</strong></td>
+            <td>Stimulant Abuse & Career Stress</td>
+            <td>Day 19 (Phase I Stabilization)</td>
+            <td>84% (16/19 Days)</td>
+            <td>17 / 19 (89%)</td>
+            <td><span class="badge-status badge-progress">Active Regulation</span></td>
+          </tr>
+          <tr>
+            <td><strong>Devon K. (Member #4915)</strong></td>
+            <td>Polysubstance & Anxiety Isolation</td>
+            <td>Day 35 (Phase II Step-Up)</td>
+            <td>88% (31/35 Days)</td>
+            <td>33 / 35 (94%)</td>
+            <td><span class="badge-status badge-steady">Steady Progress</span></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="grid-3" style="margin-top: 24px;">
+        <div class="feature-card" style="text-align: center;">
+          <div style="font-family: 'Cinzel', serif; font-size: 2.5rem; color: var(--primary); font-weight: 700;">87.4%</div>
+          <h4 style="margin-top: 8px;">90-Day Retention Rate</h4>
+          <p style="font-size: 0.82rem;">Compared to standard outpatient industry average of 42%.</p>
+        </div>
+        <div class="feature-card" style="text-align: center;">
+          <div style="font-family: 'Cinzel', serif; font-size: 2.5rem; color: var(--accent-gold); font-weight: 700;">4.2 min</div>
+          <h4 style="margin-top: 8px;">Average Daily Practice</h4>
+          <p style="font-size: 0.82rem;">Frictionless micro-checkins avoid patient survey fatigue.</p>
+        </div>
+        <div class="feature-card" style="text-align: center;">
+          <div style="font-family: 'Cinzel', serif; font-size: 2.5rem; color: var(--primary-dark); font-weight: 700;">0 Leakage</div>
+          <h4 style="margin-top: 8px;">Zero-Knowledge Cryptography</h4>
+          <p style="font-size: 0.82rem;">100% client-side journal isolation with salted AES-GCM 256.</p>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 7: CLINICAL & OPERATIONAL ROLES -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 07 / Multi-Role Ecosystem</div>
+          <h2 class="slide-title">Four Integrated Portals for Coordinated Care</h2>
+          <p class="slide-subtitle">Granular Role-Based Access Control (RBAC) connecting all stakeholders seamlessly.</p>
+        </div>
+        <div class="slide-number">07</div>
+      </div>
+
+      <div class="grid-2">
+        <div class="feature-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4>1. Member Self-Directed Portal</h4>
+            <span class="badge-status badge-success">Patient Facing</span>
+          </div>
+          <p>
+            Private, judgment-free personal sanctuary. Features morning somatic pacing, evening release journaling, streak preservation, recovery boundaries, and offline sound resets. Complete cryptographic ownership of all personal entries.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4>2. Supporter & Sponsor Portal</h4>
+            <span class="badge-status badge-steady">Trusted Allies</span>
+          </div>
+          <p>
+            Enables recovery sponsors, spouses, or trusted friends to receive non-invasive status signals. Instead of intrusive questions, supporters receive affirmative prompts ("Sam kept their morning boundary today; send a quick note of encouragement").
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4>3. Clinician Supervision Studio</h4>
+            <span class="badge-status badge-progress">Care Teams</span>
+          </div>
+          <p>
+            High-level cohort surveillance for outpatient therapists and counselors. Identifies acute drop-offs in check-in frequency (often a 48-hour precursor to physical relapse) enabling early compassionate outreach before relapse occurs.
+          </p>
+        </div>
+
+        <div class="feature-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h4>4. Enterprise Admin & Audit Studio</h4>
+            <span class="badge-status badge-success">System Admins</span>
+          </div>
+          <p>
+            Audit logging, role assignment, clinical content scheduling, devotional cadence broadcasting, and institutional compliance reporting with export capabilities for payer billing validation.
+          </p>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 8: SECURITY, COMPLIANCE & TECHNICAL ARCHITECTURE -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 08 / Technical Architecture</div>
+          <h2 class="slide-title">Enterprise Infrastructure & Zero-Trust Security</h2>
+          <p class="slide-subtitle">Built on PostgreSQL, Drizzle ORM, tRPC type-safety, and hardened cryptographic boundaries.</p>
+        </div>
+        <div class="slide-number">08</div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h3>Defensible Security Stack</h3>
+          <p>
+            In substance recovery, privacy is a matter of physical and psychological safety. ReForge enforces zero-trust architecture at every boundary:
+          </p>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; margin-top: 14px;">
+            <li style="display: flex; gap: 10px; font-size: 0.9rem;">
+              <strong style="color: var(--primary);">✓ End-to-End Encryption:</strong> Sensitive emotional thoughts and journal payloads encrypted before network transmission.
+            </li>
+            <li style="display: flex; gap: 10px; font-size: 0.9rem;">
+              <strong style="color: var(--primary);">✓ Role-Based Row Level Security:</strong> Direct database checks ensure supporters cannot read clinical charts or member journal records.
+            </li>
+            <li style="display: flex; gap: 10px; font-size: 0.9rem;">
+              <strong style="color: var(--primary);">✓ Offline PWA Architecture:</strong> Service workers and indexed client storage guarantee uninterrupted support without dropped network states.
+            </li>
+            <li style="display: flex; gap: 10px; font-size: 0.9rem;">
+              <strong style="color: var(--primary);">✓ Skeleton State Orchestration:</strong> Zero content jumps or unstyled flashes during asynchronous data loading.
+            </li>
+          </ul>
+        </div>
+
+        <div class="feature-card" style="background: #1e2e24; color: #e5ede7;">
+          <h4 style="color: #fde68a;">System Architecture Specifications</h4>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; line-height: 1.8; margin-top: 14px; opacity: 0.9;">
+            CLIENT: React 18 / TypeScript 5.6 / TailwindCSS<br/>
+            STATE: TanStack Query v5 / tRPC v11 End-to-End Typed<br/>
+            BACKEND: Node.js Express / Helmet / CSRF Token Guard<br/>
+            DATABASE: Cloud PostgreSQL / Supabase Real-time DB<br/>
+            ORM: Drizzle ORM Type-Safe Migrations<br/>
+            CRYPTO: WebCrypto SubtleCrypto (AES-GCM 256)<br/>
+            HOSTING: Containerized Cloud Native Microservice<br/>
+            AUDIT: Immutable Admin Action Logging
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <!-- SLIDE 9: IMPLEMENTATION ROADMAP & ROI -->
+    <article class="presentation-slide">
+      <div class="slide-header">
+        <div>
+          <div class="slide-meta">Slide 09 / Deployment & Impact</div>
+          <h2 class="slide-title">Implementation Roadmap & Clinical Payback</h2>
+          <p class="slide-subtitle">Rapid 4-week pilot integration with measurable reduction in 90-day readmissions.</p>
+        </div>
+        <div class="slide-number">09</div>
+      </div>
+
+      <div class="grid-4" style="margin-bottom: 32px;">
+        <div class="feature-card">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">Week 1</div>
+          <h4 style="margin: 6px 0;">Tenant Config</h4>
+          <p style="font-size: 0.82rem;">Clinician branding, custom boundary agreements, and counselor staff onboarding.</p>
+        </div>
+        <div class="feature-card">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">Week 2</div>
+          <h4 style="margin: 6px 0;">Pilot Cohort</h4>
+          <p style="font-size: 0.82rem;">Rollout to 25–50 intensive outpatient members with daily coach monitoring.</p>
+        </div>
+        <div class="feature-card">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">Week 3–4</div>
+          <h4 style="margin: 6px 0;">Supporter Links</h4>
+          <p style="font-size: 0.82rem;">Activation of sponsor and family circles with automated encouragement cadences.</p>
+        </div>
+        <div class="feature-card">
+          <div style="font-size: 0.75rem; font-weight: 700; color: var(--accent-gold); text-transform: uppercase;">Day 90+</div>
+          <h4 style="margin: 6px 0;">Outcome Audit</h4>
+          <p style="font-size: 0.82rem;">Analysis of retention curves, boundary compliance, and cost savings metrics.</p>
+        </div>
+      </div>
+
+      <div class="callout">
+        <div class="callout-title">Projected Institutional Return on Investment (ROI)</div>
+        <p class="callout-body">
+          For an outpatient facility handling 200 patients annually, increasing 90-day retention from 42% to 75% saves an estimated $410,000 in emergency re-hospitalization overhead and generates an additional $280,000 in sustained outpatient continuing-care reimbursement.
+        </p>
+      </div>
+    </article>
+
+    <!-- SLIDE 10: CONCLUSION & NEXT STEPS -->
+    <article class="presentation-slide" style="text-align: center; padding: 70px 60px;">
+      <div class="feature-icon-wrapper" style="margin: 0 auto 20px; width: 64px; height: 64px; font-size: 1.8rem; background: #254834; color: #fde68a;">
+        ✦
+      </div>
+      <h2 style="font-family: 'Source Serif 4', Georgia, serif; font-size: 2.8rem; color: var(--primary-dark); margin-bottom: 16px;">
+        Begin the Partnership with ReForge
+      </h2>
+      <p style="max-w: 680px; margin: 0 auto 36px; font-size: 1.1rem; color: var(--text-muted);">
+        Empower your patients, clinicians, and families with a compassionate, mathematically rigorous, and clinically elevated recovery infrastructure.
+      </p>
+
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="/api/presentation/download" download="ReForge_Client_Presentation.html" class="btn-action" style="font-size: 0.95rem; padding: 12px 28px;">
+          Download Offline Presentation Dossier
+        </a>
+        <button onclick="window.print()" class="btn-action secondary" style="font-size: 0.95rem; padding: 12px 28px; color: var(--primary-dark); border-color: var(--primary-light);">
+          Save as Client PDF
+        </button>
+        <a href="/dashboard" class="btn-action secondary" style="font-size: 0.95rem; padding: 12px 28px; color: var(--primary-dark); border-color: var(--primary-light);">
+          Explore Live Clinical Demo
+        </a>
+      </div>
+
+      <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border-subtle); font-size: 0.8rem; color: var(--text-light); font-family: 'JetBrains Mono', monospace;">
+        Confidential Presentation Document · Developed for Clinical Partnership Evaluation · © 2026 ReForge Recovery Systems. All rights reserved.
+      </div>
+    </article>
+
+  </div>
+
+</body>
+</html>

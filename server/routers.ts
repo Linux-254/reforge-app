@@ -1,0 +1,920 @@
+import { COOKIE_NAME } from "@shared/const";
+import { getSessionCookieOptions } from "./_core/cookies";
+import { systemRouter } from "./_core/systemRouter";
+import {
+  publicProcedure,
+  protectedProcedure,
+  adminProcedure,
+  router,
+} from "./_core/trpc";
+import { z } from "zod";
+import { TRPCError } from "@trpc/server";
+import * as db from "./db";
+
+export const appRouter = router({
+  system: systemRouter,
+
+  auth: router({
+    me: publicProcedure.query(opts => opts.ctx.user),
+    getRoles: protectedProcedure.query(({ ctx }) => ctx.userRoles),
+    logout: publicProcedure.mutation(({ ctx }) => {
+      const cookieOptions = getSessionCookieOptions(ctx.req);
+      ctx.res.clearCookie(COOKIE_NAME, { ...cookieOptions, maxAge: -1 });
+      return {
+        success: true,
+      } as const;
+    }),
+  }),
+
+  // ============================================================================
+  // PROFILE
+  // ============================================================================
+
+  profile: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      const profile = await db.getOrCreateProfile(ctx.user.id);
+      return profile;
+    }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          displayName: z.string().optional(),
+          timezone: z.string().optional(),
+          locale: z.string().optional(),
+          faithPreference: z.enum(["faith", "secular", "both"]).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const updated = await db.updateProfile(ctx.user.id, input);
+        return updated;
+      }),
+  }),
+
+  // ============================================================================
+  // ONBOARDING & ASSESSMENT
+  // ============================================================================
+
+  onboarding: router({
+    startAssessment: protectedProcedure.mutation(async ({ ctx }) => {
+      const result = await db.createAssessment(ctx.user.id);
+      return result?.[0] || null;
+    }),
+
+    saveResponse: protectedProcedure
+      .input(
+        z.object({
+          assessmentId: z.number(),
+          dimensionId: z.number(),
+          response: z.record(z.string(), z.any()),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.saveAssessmentResponse(
+          ctx.user.id,
+          input.assessmentId,
+          input.dimensionId,
+          input.response
+        );
+        return { success: true };
+      }),
+
+    responses: protectedProcedure
+      .input(z.object({ assessmentId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        return db.getAssessmentResponses(ctx.user.id, input.assessmentId);
+      }),
+
+    completeAssessment: protectedProcedure
+      .input(
+        z.object({
+          assessmentId: z.number(),
+          substanceFocus: z.enum([
+            "alcohol",
+            "nicotine",
+            "marijuana",
+            "codeine",
+            "prescription",
+          ]),
+          substanceFrequency: z
+            .enum(["daily", "weekly", "occasional"])
+            .optional(),
+          substanceApproach: z.enum(["quit", "reduce"]).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.completeAssessment(ctx.user.id, input.assessmentId);
+        await db.saveSubstanceFocus(
+          ctx.user.id,
+          input.substanceFocus,
+          input.substanceFrequency,
+          undefined,
+          input.substanceApproach || "quit"
+        );
+        await db.getOrCreateStreak(ctx.user.id);
+        return { success: true };
+      }),
+
+    getDimensions: publicProcedure.query(async ({ ctx }) => {
+      return db.getLifeDimensions();
+    }),
+
+    saveScore: protectedProcedure
+      .input(
+        z.object({
+          dimensionId: z.number(),
+          score: z.number().min(0).max(100),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.saveDimensionScore(
+          ctx.user.id,
+          input.dimensionId,
+          input.score,
+          new Date()
+        );
+        return { success: true };
+      }),
+
+    status: protectedProcedure.query(async ({ ctx }) => {
+      const [profile, substanceFocus] = await Promise.all([
+        db.getOrCreateProfile(ctx.user.id),
+        db.getSubstanceFocus(ctx.user.id),
+      ]);
+      const hasSubstance = Boolean(substanceFocus);
+      return {
+        assessmentStarted: Boolean(substanceFocus),
+        profileComplete: Boolean(profile?.displayName),
+        needsOnboarding: !hasSubstance || !profile?.displayName,
+      };
+    }),
+  }),
+
+  // ============================================================================
+  // DASHBOARD
+  // ============================================================================
+
+  dashboard: router({
+    getOverview: protectedProcedure.query(async ({ ctx }) => {
+      const profile = await db.getOrCreateProfile(ctx.user.id);
+      const streak = await db.getOrCreateStreak(ctx.user.id);
+      const dimensionScores = await db.getLatestDimensionScores(ctx.user.id);
+      const todayMorningCheckIn = await db.getTodayCheckIn(
+        ctx.user.id,
+        "morning"
+      );
+      const todayEveningCheckIn = await db.getTodayCheckIn(
+        ctx.user.id,
+        "evening"
+      );
+      const activeGoals = await db.getActiveGoalsWithProgress(ctx.user.id);
+
+      return {
+        profile,
+        streak,
+        dimensionScores,
+        todayCheckIns: {
+          morning: todayMorningCheckIn,
+          evening: todayEveningCheckIn,
+        },
+        activeGoals: activeGoals.slice(0, 3),
+      };
+    }),
+
+    getDimensionScores: protectedProcedure.query(async ({ ctx }) => {
+      return db.getLatestDimensionScores(ctx.user.id);
+    }),
+
+    getDimensionHistory: protectedProcedure
+      .input(
+        z.object({
+          dimensionId: z.number(),
+          limit: z.number().default(30),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        return db.getDimensionScoreHistory(
+          ctx.user.id,
+          input.dimensionId
+        );
+      }),
+  }),
+
+  // ============================================================================
+  // CHECK-INS
+  // ============================================================================
+
+  checkIn: router({
+    create: protectedProcedure
+      .input(
+        z.object({
+          part: z.enum(["morning", "evening"]),
+          mood: z.number().min(1).max(10).optional(),
+          energy: z.number().min(1).max(10).optional(),
+          cravings: z.number().min(1).max(10).optional(),
+          notes: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const today = new Date().toISOString().split("T")[0];
+        await db.createCheckIn(ctx.user.id, today, input.part, {
+          mood: input.mood,
+          energy: input.energy,
+          cravings: input.cravings,
+          notes: input.notes,
+        });
+
+        // Save dimension scores based on check-in data
+        if (input.mood) {
+          const dimensions = await db.getLifeDimensions();
+          // Save mood to mental-health dimension
+          const mentalHealthDim = dimensions.find(
+            d => d.slug === "mental-health"
+          );
+          if (mentalHealthDim) {
+            await db.saveDimensionScore(
+              ctx.user.id,
+              mentalHealthDim.id,
+              input.mood * 10,
+              new Date()
+            );
+          }
+        }
+
+        return { success: true };
+      }),
+
+    getToday: protectedProcedure.query(async ({ ctx }) => {
+      const morning = await db.getTodayCheckIn(ctx.user.id, "morning");
+      const evening = await db.getTodayCheckIn(ctx.user.id, "evening");
+      return { morning, evening };
+    }),
+
+    history: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().default(30),
+          offset: z.number().default(0),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        return db.listCheckIns(ctx.user.id, input.limit, input.offset);
+      }),
+
+    milestones: protectedProcedure.query(async ({ ctx }) => {
+      return db.getMilestones(ctx.user.id);
+    }),
+
+    streak: protectedProcedure.query(async ({ ctx }) => {
+      return db.getOrCreateStreak(ctx.user.id);
+    }),
+  }),
+
+  // ============================================================================
+  // JOURNAL
+  // ============================================================================
+
+  journal: router({
+    create: protectedProcedure
+      .input(
+        z.object({
+          body: z.string().trim().min(1).max(20000),
+          dimensionId: z.number().optional(),
+          promptId: z.number().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.createJournalEntry(
+          ctx.user.id,
+          input.body.trim(),
+          input.dimensionId,
+          input.promptId
+        );
+        return { success: true };
+      }),
+
+    list: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().int().min(1).max(50).default(20),
+          offset: z.number().int().min(0).default(0),
+          dimensionId: z.number().int().positive().optional(),
+          promptId: z.number().int().positive().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        return db.getJournalEntries(ctx.user.id, input.limit, input.offset, {
+          dimensionId: input.dimensionId,
+          promptId: input.promptId,
+        });
+      }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          entryId: z.number(),
+          body: z.string().trim().min(1).max(20000),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.updateJournalEntry(ctx.user.id, input.entryId, input.body.trim());
+        return { success: true };
+      }),
+
+    remove: protectedProcedure
+      .input(z.object({ entryId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deleteJournalEntry(ctx.user.id, input.entryId);
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
+  // GOALS
+  // ============================================================================
+
+  goals: router({
+    create: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().trim().min(1).max(255),
+          horizon: z.enum(["30", "90", "180"]),
+          dimensionId: z.number().int().positive().optional(),
+          description: z.string().trim().max(2000).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.createGoal(
+          ctx.user.id,
+          input.title,
+          input.horizon,
+          input.dimensionId,
+          input.description
+        );
+        return { success: true };
+      }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return db.getActiveGoals(ctx.user.id);
+    }),
+
+    all: protectedProcedure.query(async ({ ctx }) => {
+      return db.getGoals(ctx.user.id);
+    }),
+
+    addStep: protectedProcedure
+      .input(
+        z.object({
+          goalId: z.number(),
+          title: z.string().trim().min(1).max(255),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.addGoalStep(ctx.user.id, input.goalId, input.title);
+        return { success: true };
+      }),
+
+    steps: protectedProcedure
+      .input(z.object({ goalId: z.number() }))
+      .query(async ({ ctx, input }) => {
+        return db.getGoalSteps(ctx.user.id, input.goalId);
+      }),
+
+    toggleStep: protectedProcedure
+      .input(z.object({ goalId: z.number(), stepId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.toggleGoalStep(ctx.user.id, input.goalId, input.stepId);
+        return { success: true };
+      }),
+
+    updateStatus: protectedProcedure
+      .input(
+        z.object({
+          goalId: z.number(),
+          status: z.enum(["active", "completed", "abandoned"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.updateGoalStatus(ctx.user.id, input.goalId, input.status);
+        return { success: true };
+      }),
+
+    history: protectedProcedure
+      .input(z.object({ goalId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        return db.getGoalStatusHistory(ctx.user.id, input.goalId);
+      }),
+
+    remove: protectedProcedure
+      .input(z.object({ goalId: z.number().int().positive() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deleteGoal(ctx.user.id, input.goalId);
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
+  // RULES & BOUNDARIES
+  // ============================================================================
+
+  rules: router({
+    create: protectedProcedure
+      .input(
+        z.object({
+          text: z.string().trim().min(1).max(500),
+          reviewCadence: z.enum(["daily", "weekly", "monthly"]).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.createRule(ctx.user.id, input.text, input.reviewCadence);
+        return { success: true };
+      }),
+
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return db.getActiveRules(ctx.user.id);
+    }),
+
+    listWithStatus: protectedProcedure.query(async ({ ctx }) => {
+      return db.getRulesWithReviewStatus(ctx.user.id);
+    }),
+
+    all: protectedProcedure.query(async ({ ctx }) => {
+      return db.getRulesWithReviewStatus(ctx.user.id);
+    }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          ruleId: z.number().int().positive(),
+          text: z.string().trim().min(1).max(500).optional(),
+          active: z.boolean().optional(),
+          reviewCadence: z.enum(["daily", "weekly", "monthly"]).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.updateRule(ctx.user.id, input.ruleId, {
+          text: input.text,
+          active: input.active,
+          reviewCadence: input.reviewCadence,
+        });
+        return { success: true };
+      }),
+
+    review: protectedProcedure
+      .input(
+        z.object({
+          ruleId: z.number().int().positive(),
+          kept: z.boolean(),
+          notes: z.string().trim().max(2000).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.createRuleReview(ctx.user.id, input.ruleId, input.kept, input.notes);
+        return { success: true };
+      }),
+
+    reviews: protectedProcedure
+      .input(z.object({ ruleId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        return db.getRuleReviews(ctx.user.id, input.ruleId);
+      }),
+
+    remove: protectedProcedure
+      .input(z.object({ ruleId: z.number() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deleteRule(ctx.user.id, input.ruleId);
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
+  // MUSIC REHABILITATION
+  // ============================================================================
+
+  music: router({
+    getProfile: protectedProcedure.query(async ({ ctx }) => {
+      return db.getOrCreateMusicProfile(ctx.user.id);
+    }),
+
+    updateProfile: protectedProcedure
+      .input(
+        z.object({
+          triggerGenres: z.string().optional(),
+          triggerArtists: z.string().optional(),
+          safeGenres: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.updateMusicProfile(ctx.user.id, input);
+      }),
+
+    createPlaylist: protectedProcedure
+      .input(
+        z.object({
+          title: z.string().min(1),
+          context: z.string().optional(),
+          tracks: z.array(z.any()).optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.createPlaylist(
+          ctx.user.id,
+          input.title,
+          input.context,
+          input.tracks
+        );
+        return { success: true };
+      }),
+
+    getPlaylists: protectedProcedure.query(async ({ ctx }) => {
+      return db.getPlaylists(ctx.user.id);
+    }),
+  }),
+
+  // ============================================================================
+  // NEWSLETTER
+  // ============================================================================
+
+  newsletter: router({
+    subscribe: publicProcedure
+      .input(
+        z.object({
+          email: z.string().email(),
+          sendTypes: z
+            .array(
+              z.enum(["daily", "weekly", "milestone", "dimension", "situation"])
+            )
+            .min(1),
+          source: z.string().optional(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        await db.subscribeToNewsletter(
+          input.email,
+          undefined,
+          input.source,
+          input.sendTypes
+        );
+        return { success: true, status: "pending" as const };
+      }),
+
+    confirm: publicProcedure
+      .input(z.object({ token: z.string().min(32) }))
+      .mutation(async ({ input }) => {
+        const confirmed = await db.confirmNewsletterSubscription(input.token);
+        return { confirmed };
+      }),
+
+    unsubscribe: publicProcedure
+      .input(z.object({ email: z.string().email() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.unsubscribeFromNewsletter(input.email);
+        return { success: true };
+      }),
+
+    getStatus: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.user.email) return undefined;
+      const sub = await db.getSubscriptionByEmail(ctx.user.email);
+      if (sub) return sub;
+      return { email: ctx.user.email, status: "unsubscribed", preferences: {} };
+    }),
+
+    updatePreferences: protectedProcedure
+      .input(
+        z.object({
+          preferences: z.record(z.string(), z.unknown()),
+          subscribe: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.user.email) return { success: false };
+        if (input.subscribe === true) {
+          await db.subscribeToNewsletter(
+            ctx.user.email,
+            ctx.user.id,
+            "account"
+          );
+        } else if (input.subscribe === false) {
+          await db.unsubscribeFromNewsletter(ctx.user.email);
+        }
+        await db.updateSubscriptionPreferences(
+          ctx.user.email,
+          input.preferences
+        );
+        return { success: true };
+      }),
+
+    getIssues: protectedProcedure
+      .input(
+        z.object({
+          limit: z.number().int().min(1).max(50).default(20),
+          offset: z.number().int().min(0).default(0),
+        })
+      )
+      .query(async ({ input }) => {
+        return db.listNewsletterIssues(input.limit, input.offset);
+      }),
+
+    createIssue: adminProcedure
+      .input(
+        z.object({
+          type: z.enum([
+            "daily",
+            "weekly",
+            "milestone",
+            "dimension",
+            "situation",
+          ]),
+          subject: z.string().trim().min(1).max(180),
+          body: z.string().trim().min(1).max(20000),
+          scheduledFor: z.string().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.createNewsletterIssue(
+          input.type,
+          input.subject,
+          input.body,
+          input.scheduledFor ? new Date(input.scheduledFor) : undefined
+        );
+        await db.recordAdminAudit({
+          actorUserId: ctx.user.id,
+          action: "newsletter.issue.create",
+          targetType: "newsletter_issue",
+          outcome: "success",
+        });
+        return { success: true };
+      }),
+
+    updateIssue: adminProcedure
+      .input(
+        z.object({
+          id: z.number().int().positive(),
+          type: z
+            .enum(["daily", "weekly", "milestone", "dimension", "situation"])
+            .optional(),
+          subject: z.string().trim().min(1).max(180).optional(),
+          body: z.string().trim().min(1).max(20000).optional(),
+          scheduledFor: z.string().nullable().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        const { id, scheduledFor, ...rest } = input;
+        await db.updateNewsletterIssue(id, {
+          ...rest,
+          ...(scheduledFor === undefined
+            ? {}
+            : { scheduledFor: scheduledFor ? new Date(scheduledFor) : null }),
+        });
+        await db.recordAdminAudit({
+          actorUserId: ctx.user.id,
+          action: "newsletter.issue.update",
+          targetType: "newsletter_issue",
+          targetId: id,
+          outcome: "success",
+        });
+        return { success: true };
+      }),
+
+    deleteIssue: adminProcedure
+      .input(z.object({ id: z.number().int().positive() }))
+      .mutation(async ({ ctx, input }) => {
+        await db.deleteNewsletterIssue(input.id);
+        await db.recordAdminAudit({
+          actorUserId: ctx.user.id,
+          action: "newsletter.issue.delete",
+          targetType: "newsletter_issue",
+          targetId: input.id,
+          outcome: "success",
+        });
+        return { success: true };
+      }),
+  }),
+
+  // ============================================================================
+  // RESOURCES
+  // ============================================================================
+
+  resources: router({
+    getByDimension: publicProcedure
+      .input(
+        z.object({
+          dimensionId: z.number(),
+          type: z.string().optional(),
+        })
+      )
+      .query(async ({ ctx, input }) => {
+        return db.getResourcesByDimension(input.dimensionId, input.type);
+      }),
+
+    getByType: publicProcedure
+      .input(
+        z.object({
+          type: z.string(),
+          limit: z.number().default(20),
+        })
+      )
+      .query(async ({ input }) => {
+        return db.getResourcesByType(input.type, input.limit);
+      }),
+
+    getById: publicProcedure
+      .input(z.object({ resourceId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getResourceById(input.resourceId);
+      }),
+  }),
+
+  devotional: router({
+    today: protectedProcedure.query(async ({ ctx }) => {
+      const devotionals = await db.getResourcesByType("devotional");
+      if (devotionals.length === 0) return undefined;
+
+      const day = Math.floor(Date.now() / 86_400_000);
+      const index = day % devotionals.length;
+      return devotionals[index];
+    }),
+  }),
+
+  // ============================================================================
+  // PREFERENCES
+  // ============================================================================
+
+  preferences: router({
+    get: protectedProcedure.query(async ({ ctx }) => {
+      return db.getOrCreateUserPreferences(ctx.user.id);
+    }),
+
+    update: protectedProcedure
+      .input(
+        z.object({
+          morningCheckInTime: z.string().regex(/^(?:[01]\\d|2[0-3]):[0-5]\\d$/, "Use 24-hour HH:MM time").optional(),
+          eveningCheckInTime: z.string().regex(/^(?:[01]\\d|2[0-3]):[0-5]\\d$/, "Use 24-hour HH:MM time").optional(),
+          notificationsEnabled: z.boolean().optional(),
+          emailNotifications: z.boolean().optional(),
+          musicConsent: z.boolean().optional(),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        return db.updateUserPreferences(ctx.user.id, input);
+      }),
+  }),
+
+    // ============================================================================
+  // SUPPORTER ACCESS (CONSENT-SCOPED)
+  // ============================================================================
+  supporter: router({
+    links: protectedProcedure.query(async ({ ctx }) => {
+      if (!ctx.userRoles.includes("supporter") && !ctx.userRoles.includes("admin")) {
+        await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.links.list", targetType: "supporter_link", outcome: "rejected" });
+        throw new TRPCError({ code: "FORBIDDEN" });
+      }
+      const links = await db.listSupporterLinks(ctx.user.id);
+      await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.links.list", targetType: "supporter_link", outcome: "success" });
+      return links;
+    }),
+
+    createLink: protectedProcedure
+      .input(z.object({
+        memberId: z.number().int().positive(),
+        consentScope: z.enum(["dashboard_only", "dashboard_and_journal", "full_access"]).default("dashboard_only"),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.userRoles.includes("supporter") && !ctx.userRoles.includes("admin")) {
+          await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.link.create", targetType: "member", targetId: input.memberId, outcome: "rejected" });
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        const created = await db.createSupporterLink(ctx.user.id, input.memberId, input.consentScope);
+        if (!created) {
+          await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.link.create", targetType: "member", targetId: input.memberId, outcome: "rejected" });
+          throw new TRPCError({ code: "CONFLICT", message: "Member is unavailable or already has a pending or active supporter link." });
+        }
+        await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.link.create", targetType: "member", targetId: input.memberId, outcome: "success" });
+        return created;
+      }),
+
+    revokeLink: protectedProcedure
+      .input(z.object({ linkId: z.number().int().positive() }))
+      .mutation(async ({ ctx, input }) => {
+        if (!ctx.userRoles.includes("supporter") && !ctx.userRoles.includes("admin")) {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        const revoked = await db.revokeSupporterLink(input.linkId, ctx.user.id);
+        if (!revoked) {
+          await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.link.revoke", targetType: "supporter_link", targetId: input.linkId, outcome: "rejected" });
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.link.revoke", targetType: "supporter_link", targetId: input.linkId, outcome: "success" });
+        return { success: true } as const;
+      }),
+
+    accessSummary: protectedProcedure
+      .input(z.object({ memberId: z.number().int().positive() }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.userRoles.includes("supporter") && !ctx.userRoles.includes("admin")) {
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        const link = await db.getActiveSupporterLink(ctx.user.id, input.memberId);
+        if (!link) {
+          await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.access.summary", targetType: "member", targetId: input.memberId, outcome: "rejected" });
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.access.summary", targetType: "member", targetId: input.memberId, outcome: "success" });
+        return {
+          memberId: link.memberId,
+          consentScope: link.consentScope,
+          canViewJournal: link.consentScope !== "dashboard_only",
+          canViewFullAccess: link.consentScope === "full_access",
+        };
+      }),
+
+    journal: protectedProcedure
+      .input(z.object({ memberId: z.number().int().positive(), limit: z.number().int().min(1).max(50).default(20), offset: z.number().int().min(0).default(0) }))
+      .query(async ({ ctx, input }) => {
+        if (!ctx.userRoles.includes("supporter") && !ctx.userRoles.includes("admin")) {
+          await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.access.journal", targetType: "member", targetId: input.memberId, outcome: "rejected" });
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        const link = await db.getActiveSupporterLink(ctx.user.id, input.memberId);
+        if (!db.supporterCanAccessJournal(link)) {
+          await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.access.journal", targetType: "member", targetId: input.memberId, outcome: "rejected" });
+          throw new TRPCError({ code: "FORBIDDEN" });
+        }
+        const entries = await db.getJournalEntries(input.memberId, input.limit, input.offset);
+        await db.recordAdminAudit({ actorUserId: ctx.user.id, action: "supporter.access.journal", targetType: "member", targetId: input.memberId, outcome: "success" });
+        return entries;
+      }),
+  }),
+
+  // ============================================================================
+  // ADMIN (RBAC)
+  // ============================================================================
+  admin: router({
+    listUsers: adminProcedure
+      .input(
+        z.object({
+          limit: z.number().int().min(1).max(100).default(50),
+          offset: z.number().int().min(0).default(0),
+        })
+      )
+      .query(async ({ input }) => {
+        return db.listUsers(input.limit, input.offset);
+      }),
+
+    getUserRoles: adminProcedure
+      .input(z.object({ userId: z.number() }))
+      .query(async ({ input }) => {
+        return db.getUserRoles(input.userId);
+      }),
+
+    grantRole: adminProcedure
+      .input(
+        z.object({
+          userId: z.number().int().positive(),
+          role: z.enum(["supporter", "mentor", "moderator", "admin"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        await db.grantUserRole(input.userId, input.role);
+        await db.recordAdminAudit({
+          actorUserId: ctx.user.id,
+          action: "user.role.grant",
+          targetType: "user",
+          targetId: input.userId,
+          outcome: "success",
+        });
+        return { success: true };
+      }),
+
+    revokeRole: adminProcedure
+      .input(
+        z.object({
+          userId: z.number().int().positive(),
+          role: z.enum(["supporter", "mentor", "moderator", "admin"]),
+        })
+      )
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.id === input.userId && input.role === "admin") {
+          await db.recordAdminAudit({
+            actorUserId: ctx.user.id,
+            action: "user.role.revoke",
+            targetType: "user",
+            targetId: input.userId,
+            outcome: "rejected",
+          });
+          throw new TRPCError({ code: "FORBIDDEN", message: "You cannot revoke your own administrator access." });
+        }
+        await db.revokeUserRole(input.userId, input.role);
+        await db.recordAdminAudit({
+          actorUserId: ctx.user.id,
+          action: "user.role.revoke",
+          targetType: "user",
+          targetId: input.userId,
+          outcome: "success",
+        });
+        return { success: true };
+      }),
+  }),
+});
+
+export type AppRouter = typeof appRouter;
