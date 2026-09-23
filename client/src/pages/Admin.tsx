@@ -667,7 +667,7 @@ export default function Admin() {
       {/* Header Bar */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl transition-all">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3.5 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
             <div className="lg:hidden shrink-0">
               <UnifiedMobileNav />
             </div>
@@ -676,11 +676,11 @@ export default function Admin() {
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/dashboard")}
-              className="min-h-[40px] gap-2 text-foreground/80 hover:text-foreground rounded-full border border-border/60 bg-card/60 hover:bg-muted/80 px-3.5 text-xs font-medium touch-manipulation transition-all"
+              className="min-h-[44px] gap-2 text-foreground/85 hover:text-foreground rounded-full border border-border/70 bg-card/80 hover:bg-muted px-3.5 sm:px-4 text-xs font-semibold touch-manipulation transition-all shadow-2xs"
             >
-              <ArrowLeft className="h-4 w-4 text-primary" />
-              <span className="hidden sm:inline">Back to</span>
-              <span>
+              <ArrowLeft className="h-4 w-4 text-primary shrink-0" />
+              <span className="hidden md:inline">Back to</span>
+              <span className="truncate max-w-[140px] sm:max-w-none">
                 {role === "coach"
                   ? "Coach Dashboard"
                   : role === "supporter"
@@ -688,16 +688,19 @@ export default function Admin() {
                   : "Workspace Dashboard"}
               </span>
             </Button>
-            <div className="flex items-center gap-2.5">
-              <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary shadow-sm">
-                <ShieldCheck className="h-5 w-5" />
+            
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="grid h-10 w-10 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary shadow-xs ring-1 ring-primary/25">
+                <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" />
               </span>
-              <div>
-                <h1 className="burnt-wood-heading font-serif text-xl sm:text-2xl font-bold leading-tight">
+              <div className="min-w-0">
+                <h1 className="burnt-wood-heading font-serif text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground leading-tight truncate">
                   Admin Control & Content Studio
                 </h1>
-                <p className="text-xs text-muted-foreground hidden sm:block">
-                  Full CRUD control over 21 Dimensions, recovery guides, boundaries, community, and users
+                <p className="text-xs text-muted-foreground hidden sm:flex items-center gap-2 mt-0.5">
+                  <span>Full CRUD authority</span>
+                  <span>•</span>
+                  <span>21 Dimensions, guides, boundaries, community & users</span>
                 </p>
               </div>
             </div>
