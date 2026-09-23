@@ -59,6 +59,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -89,6 +96,7 @@ export default function Admin() {
 
   // Active Tab
   const [activeTab, setActiveTab] = useState<AdminTab>("dimensions");
+  const [adminNavDrawerOpen, setAdminNavDrawerOpen] = useState(false);
 
   // Local State powered by DemoDataManager
   const [dimensions, setDimensions] = useState<DimensionItem[]>(() => DemoDataManager.getDimensions());
@@ -772,133 +780,176 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Tab Navigation */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 border-b border-border/70 scrollbar-none">
-          <button
-            type="button"
-            onClick={() => setActiveTab("dimensions")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "dimensions"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <Compass className="h-4 w-4" />
-            <span>21 Dimensions</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
-              {dimensions.length}
-            </Badge>
-          </button>
+        {/* =========================================================================
+            ADMIN MODULE NAVIGATION HUB (Dedicated Drawer / Menu & Quick Pills)
+           ========================================================================= */}
+        {(() => {
+          const adminModulesList: {
+            id: AdminTab;
+            label: string;
+            icon: typeof Compass;
+            count: number | null;
+            desc: string;
+          }[] = [
+            { id: "dimensions", label: "21 Dimensions", icon: Compass, count: dimensions.length, desc: "Full CRUD over all 21 life recovery dimensions & scoring" },
+            { id: "guides", label: "Recovery Guides", icon: BookOpen, count: guides.length, desc: "Urge surfing, somatic grounding, and practice guides" },
+            { id: "rules", label: "Boundary Rules", icon: ShieldCheck, count: rules.length, desc: "Sober agreements, high-risk triggers & safety rules" },
+            { id: "community", label: "Community Posts", icon: MessageSquare, count: posts.length, desc: "Moderate peer circle discussions, pin notices & manage threads" },
+            { id: "users", label: "Users & Roles", icon: Users, count: managedUsers.length, desc: "Manage registered practitioners, coaches, supporters & admins" },
+            { id: "supporters", label: "Supporter Links", icon: HeartHandshake, count: supporterConnections.length, desc: "Administer trusted advocate pairings & consented vital channels" },
+            { id: "newsletter", label: "Newsletter", icon: Newspaper, count: existingIssues?.length ?? 0, desc: "Draft, schedule, and publish weekly community essays" },
+            { id: "logs", label: "Audit Trail", icon: History, count: auditLogs.length, desc: "Real-time security logs, action timestamps & actor records" },
+          ];
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("guides")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "guides"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <BookOpen className="h-4 w-4" />
-            <span>Recovery Guides</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
-              {guides.length}
-            </Badge>
-          </button>
+          const currentModule = adminModulesList.find((m) => m.id === activeTab) || adminModulesList[0];
+          const CurrentIcon = currentModule.icon;
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("rules")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "rules"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <ShieldCheck className="h-4 w-4" />
-            <span>Boundary Rules</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
-              {rules.length}
-            </Badge>
-          </button>
+          return (
+            <div className="space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2 border-b border-border/70">
+                {/* Dedicated Admin Modules Drawer Sheet Trigger */}
+                <Sheet open={adminNavDrawerOpen} onOpenChange={setAdminNavDrawerOpen}>
+                  <SheetTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="min-h-[44px] gap-2.5 rounded-2xl border-primary/40 bg-primary/10 hover:bg-primary/20 text-primary font-semibold px-3.5 sm:px-4 shadow-2xs touch-manipulation"
+                    >
+                      <CurrentIcon className="h-4.5 w-4.5 shrink-0" />
+                      <span className="text-xs sm:text-sm font-semibold truncate max-w-[170px] sm:max-w-none">
+                        Module: {currentModule.label}
+                      </span>
+                      {currentModule.count !== null && (
+                        <Badge variant="secondary" className="text-[11px] px-1.5 py-0 h-4.5 bg-primary text-primary-foreground font-bold">
+                          {currentModule.count}
+                        </Badge>
+                      )}
+                      <span className="ml-1 text-[11px] uppercase tracking-wider text-muted-foreground hidden sm:inline">
+                        (All 8 Modules ☰)
+                      </span>
+                    </Button>
+                  </SheetTrigger>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("community")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "community"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <MessageSquare className="h-4 w-4" />
-            <span>Community Posts</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
-              {posts.length}
-            </Badge>
-          </button>
+                  <SheetContent
+                    side="left"
+                    className="w-[85vw] max-w-[360px] sm:max-w-md p-0 flex flex-col h-full max-h-dvh bg-background/98 backdrop-blur-2xl border-r border-border/70 shadow-2xl overflow-hidden box-border"
+                  >
+                    <SheetHeader className="flex flex-row items-center justify-between px-4 py-3.5 pr-14 border-b border-border/60 bg-muted/25 shrink-0 min-h-[60px]">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary">
+                          <ShieldCheck className="h-5 w-5" />
+                        </span>
+                        <div className="min-w-0">
+                          <SheetTitle className="font-serif text-lg font-bold text-foreground leading-tight truncate">
+                            Admin Studio Navigation
+                          </SheetTitle>
+                          <p className="text-[11px] text-muted-foreground truncate">8 Management Modules</p>
+                        </div>
+                      </div>
+                    </SheetHeader>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("users")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "users"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <Users className="h-4 w-4" />
-            <span>Users & Roles</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
-              {managedUsers.length}
-            </Badge>
-          </button>
+                    <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain px-3 py-3.5 space-y-2">
+                      <p className="text-xs text-muted-foreground px-1 mb-1">
+                        Select an administrative control module to inspect and edit:
+                      </p>
+                      {adminModulesList.map((m) => {
+                        const Icon = m.icon;
+                        const isSelected = activeTab === m.id;
+                        return (
+                          <button
+                            key={m.id}
+                            type="button"
+                            onClick={() => {
+                              setActiveTab(m.id);
+                              setAdminNavDrawerOpen(false);
+                            }}
+                            className={`flex items-center justify-between gap-3 w-full px-3.5 py-3 rounded-xl text-left transition-all touch-manipulation min-h-[56px] ${
+                              isSelected
+                                ? "bg-primary text-primary-foreground border border-primary shadow-xs font-semibold"
+                                : "bg-card/70 hover:bg-muted text-foreground/90 hover:text-foreground border border-border/50"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                              <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg ${
+                                isSelected ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/10 text-primary"
+                              }`}>
+                                <Icon className="h-4.5 w-4.5" />
+                              </span>
+                              <div className="min-w-0 flex-1 truncate">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-sm font-semibold truncate leading-tight">{m.label}</span>
+                                  {m.count !== null && (
+                                    <span className={`text-[10px] px-1.5 py-0.2 rounded-md font-bold shrink-0 ${
+                                      isSelected ? "bg-primary-foreground/25 text-primary-foreground" : "bg-muted text-muted-foreground"
+                                    }`}>
+                                      {m.count}
+                                    </span>
+                                  )}
+                                </div>
+                                <p className={`text-[11px] truncate mt-0.5 ${isSelected ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                                  {m.desc}
+                                </p>
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary-foreground/25 text-primary-foreground">
+                                <Check className="h-3 w-3" />
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("supporters")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "supporters"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <HeartHandshake className="h-4 w-4" />
-            <span>Supporter Links</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
-              {supporterConnections.length}
-            </Badge>
-          </button>
+                    <div className="p-3.5 border-t border-border/60 bg-muted/20 shrink-0 flex items-center justify-between text-xs text-muted-foreground">
+                      <span>Authority: Full Admin CRUD</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setAdminNavDrawerOpen(false)}
+                        className="h-8 px-2.5 text-xs rounded-lg text-foreground hover:bg-muted"
+                      >
+                        Close Menu
+                      </Button>
+                    </div>
+                  </SheetContent>
+                </Sheet>
 
-          <button
-            type="button"
-            onClick={() => setActiveTab("newsletter")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "newsletter"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <Newspaper className="h-4 w-4" />
-            <span>Newsletter</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setActiveTab("logs")}
-            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
-              activeTab === "logs"
-                ? "bg-primary text-primary-foreground shadow-sm"
-                : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
-            }`}
-          >
-            <History className="h-4 w-4" />
-            <span>Audit Trail</span>
-            <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0 h-4">
-              {auditLogs.length}
-            </Badge>
-          </button>
-        </div>
+                {/* Quick Navigation Scrollable Track */}
+                <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none flex-1 min-w-0 py-0.5">
+                  {adminModulesList.map((m) => {
+                    const Icon = m.icon;
+                    const isSelected = activeTab === m.id;
+                    return (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setActiveTab(m.id)}
+                        className={`flex min-h-[42px] items-center gap-1.5 px-3 py-2 text-xs rounded-full font-medium transition-all shrink-0 touch-manipulation ${
+                          isSelected
+                            ? "bg-primary text-primary-foreground shadow-xs font-semibold"
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/70 bg-card/60 border border-border/50"
+                        }`}
+                      >
+                        <Icon className="h-3.5 w-3.5 shrink-0" />
+                        <span>{m.label}</span>
+                        {m.count !== null && (
+                          <Badge
+                            variant="secondary"
+                            className={`ml-0.5 text-[10px] px-1.5 py-0 h-4 ${
+                              isSelected ? "bg-primary-foreground/20 text-primary-foreground" : "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {m.count}
+                          </Badge>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* =========================================================================
             TAB 1: 21 DIMENSIONS (CRUD)
