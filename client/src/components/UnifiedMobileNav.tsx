@@ -39,6 +39,7 @@ import {
   Layers,
   Award,
   ChevronRight,
+  Check,
 } from "lucide-react";
 
 interface UnifiedMobileNavProps {
@@ -49,7 +50,7 @@ interface UnifiedMobileNavProps {
 }
 
 const workspaceLinks = [
-  { href: "/dashboard", label: "Dashboard Overview", icon: LayoutDashboard, desc: "Personal recovery rhythm & daily pulse" },
+  { href: "/dashboard", label: "Dashboard Overview", icon: LayoutDashboard, desc: "Daily practice rhythm & vitality pulse" },
   { href: "/progress", label: "21 Dimensions Progress", icon: BarChart3, desc: "Holistic life balance & progress meters" },
   { href: "/check-ins", label: "Daily Check-In", icon: CheckCircle2, desc: "Morning vitality & evening reflection" },
   { href: "/check-in-history", label: "Check-In History", icon: History, desc: "Past logs, patterns & mood trends" },
@@ -66,15 +67,15 @@ const workspaceLinks = [
 ];
 
 const siteLinks = [
-  { href: "/", label: "Home", icon: Home },
-  { href: "/how-it-works", label: "How It Works", icon: Sparkles },
-  { href: "/dimensions", label: "21 Dimensions", icon: Layers },
-  { href: "/daily-practice", label: "Daily Practice", icon: Compass },
-  { href: "/success", label: "Recovery Stories", icon: Award },
-  { href: "/supporters", label: "For Supporters & Allies", icon: HeartHandshake },
-  { href: "/about", label: "Our Story & Method", icon: Info },
-  { href: "/faq", label: "FAQs", icon: HelpCircle },
-  { href: "/contact", label: "Contact & Help", icon: Mail },
+  { href: "/", label: "Home", icon: Home, desc: "Landing & overview" },
+  { href: "/how-it-works", label: "How It Works", icon: Sparkles, desc: "The ReForge 4-pillar methodology" },
+  { href: "/dimensions", label: "21 Dimensions", icon: Layers, desc: "Holistic recovery framework" },
+  { href: "/daily-practice", label: "Daily Practice", icon: Compass, desc: "Rhythms, journaling & breathwork" },
+  { href: "/success", label: "Recovery Stories", icon: Award, desc: "Real journeys & testimonials" },
+  { href: "/supporters", label: "For Supporters & Allies", icon: HeartHandshake, desc: "Guiding family & partners" },
+  { href: "/about", label: "Our Story & Method", icon: Info, desc: "Mission, ethics & foundation" },
+  { href: "/faq", label: "FAQs", icon: HelpCircle, desc: "Common questions & support" },
+  { href: "/contact", label: "Contact & Help", icon: Mail, desc: "Reach our care team" },
 ];
 
 const rolesList: {
@@ -83,6 +84,7 @@ const rolesList: {
   roleTitle: string;
   icon: typeof User;
   badge: string;
+  desc: string;
 }[] = [
   {
     id: "member",
@@ -90,6 +92,7 @@ const rolesList: {
     roleTitle: "Member / Practitioner",
     icon: User,
     badge: "Recovery Mode",
+    desc: "Personal check-ins, journal & dimensions",
   },
   {
     id: "supporter",
@@ -97,6 +100,7 @@ const rolesList: {
     roleTitle: "Supporter / Ally",
     icon: HeartHandshake,
     badge: "Partner View",
+    desc: "Encouragement & shared milestones",
   },
   {
     id: "coach",
@@ -104,6 +108,7 @@ const rolesList: {
     roleTitle: "Clinical Coach",
     icon: Stethoscope,
     badge: "Caseload View",
+    desc: "Client caseload, risk alerts & notes",
   },
   {
     id: "admin",
@@ -111,6 +116,7 @@ const rolesList: {
     roleTitle: "Platform Admin",
     icon: ShieldCheck,
     badge: "Full Access",
+    desc: "Full CRUD content, dimensions & users",
   },
 ];
 
@@ -142,7 +148,7 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
           aria-label="Open main navigation menu"
           className={
             triggerClassName ||
-            "min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl border border-border/70 bg-card/70 text-foreground hover:bg-muted/80 transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+            "min-h-[48px] min-w-[48px] flex items-center justify-center rounded-xl border border-border/70 bg-card/80 text-foreground hover:bg-muted transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-primary shadow-2xs"
           }
         >
           <Menu className="h-5 w-5" />
@@ -151,39 +157,39 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
 
       <SheetContent
         side="left"
-        className="w-[92vw] max-w-sm sm:max-w-md p-0 flex flex-col bg-background/98 backdrop-blur-2xl border-r border-border/70"
+        className="w-[94vw] max-w-sm sm:max-w-md p-0 flex flex-col bg-background/98 backdrop-blur-2xl border-r border-border/70 shadow-2xl"
       >
         {/* Drawer Header */}
-        <SheetHeader className="p-4 sm:p-5 border-b border-border/60 text-left bg-muted/30">
+        <SheetHeader className="p-4 sm:p-5 border-b border-border/60 text-left bg-muted/20">
           <div className="flex items-center justify-between gap-3">
             <button
               type="button"
               onClick={() => handleLinkClick("/")}
-              className="flex items-center gap-2.5 text-left group focus:outline-none"
+              className="flex items-center gap-3 text-left group focus:outline-none min-h-[44px]"
             >
-              <BrandLogoIcon size={34} className="transition-transform group-hover:-rotate-6 shrink-0" />
+              <BrandLogoIcon size={36} className="transition-transform group-hover:-rotate-6 shrink-0" />
               <div>
-                <SheetTitle className="font-serif text-xl font-bold tracking-tight text-foreground leading-none">
+                <SheetTitle className="font-serif text-xl sm:text-2xl font-bold tracking-tight text-foreground leading-none">
                   Re<span className="text-primary font-extrabold">Forge</span>
                 </SheetTitle>
-                <p className="text-[11px] text-muted-foreground mt-0.5">Whole-Life Recovery Platform</p>
+                <p className="text-xs text-muted-foreground mt-0.5">Whole-Life Recovery Platform</p>
               </div>
             </button>
             <ThemeToggle compact />
           </div>
 
-          {/* Persona / Member Mode Switcher with Spaced Touch-Friendly Stack */}
-          <div className="mt-4 pt-3.5 border-t border-border/50 space-y-2">
-            <div className="flex items-center justify-between">
-              <span className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
-                <Sparkles className="h-3.5 w-3.5 text-primary" /> Active Persona
+          {/* Persona / Member Mode Switcher with Spacious Touch-Friendly Cards */}
+          <div className="mt-4 pt-3.5 border-t border-border/50 space-y-2.5">
+            <div className="flex items-center justify-between px-0.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-primary" /> Active Demo Persona
               </span>
-              <Badge variant="outline" className="text-[10px] px-2 py-0 border-primary/40 bg-primary/10 text-primary font-semibold">
+              <Badge variant="outline" className="text-[11px] px-2.5 py-0.5 border-primary/40 bg-primary/10 text-primary font-semibold">
                 {user.name}
               </Badge>
             </div>
 
-            {/* Role Buttons Stack with Clear Labels and Spacing */}
+            {/* Role Buttons in a spacious grid with generous touch targets */}
             <div className="grid grid-cols-2 gap-2">
               {rolesList.map((r) => {
                 const Icon = r.icon;
@@ -193,16 +199,20 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
                     key={r.id}
                     type="button"
                     onClick={() => handleRoleChange(r.id)}
-                    className={`flex items-center gap-2 p-2.5 rounded-xl text-left transition-all touch-manipulation min-h-[44px] ${
+                    className={`flex items-center gap-2.5 p-3 rounded-2xl text-left transition-all touch-manipulation min-h-[52px] ${
                       isActive
-                        ? "bg-primary text-primary-foreground border border-primary shadow-xs font-semibold"
-                        : "bg-background/90 hover:bg-muted border border-border/70 text-foreground/80 hover:text-foreground"
+                        ? "bg-primary text-primary-foreground border border-primary shadow-sm ring-1 ring-primary/40 font-semibold"
+                        : "bg-card/90 hover:bg-muted border border-border/70 text-foreground/80 hover:text-foreground"
                     }`}
                   >
-                    <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary-foreground" : "text-primary"}`} />
+                    <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-xl ${
+                      isActive ? "bg-primary-foreground/20 text-primary-foreground" : "bg-primary/10 text-primary"
+                    }`}>
+                      <Icon className="h-4 w-4" />
+                    </span>
                     <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium leading-tight truncate">{r.name}</p>
-                      <p className={`text-[10px] truncate ${isActive ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
+                      <p className="text-xs font-semibold leading-tight truncate">{r.name}</p>
+                      <p className={`text-[10px] truncate mt-0.5 ${isActive ? "text-primary-foreground/80" : "text-muted-foreground"}`}>
                         {r.roleTitle.split(" / ")[0]}
                       </p>
                     </div>
@@ -219,15 +229,15 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
             {/* Recovery App Workspace Section */}
             <div>
               <div className="flex items-center justify-between px-2 mb-2.5">
-                <p className="text-[11px] font-bold uppercase tracking-wider text-primary">
+                <p className="text-xs font-bold uppercase tracking-wider text-primary">
                   Recovery Practice Workspace
                 </p>
-                <span className="text-[10px] text-muted-foreground bg-muted/60 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] text-muted-foreground bg-muted px-2 py-0.5 rounded-full font-medium">
                   14 tools
                 </span>
               </div>
               
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {workspaceLinks.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.href;
@@ -236,31 +246,33 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
                       key={item.href}
                       type="button"
                       onClick={() => handleLinkClick(item.href)}
-                      className={`w-full min-h-[46px] flex items-center justify-between px-3 py-2.5 rounded-xl text-sm font-medium transition-all touch-manipulation text-left ${
+                      className={`w-full min-h-[52px] flex items-center justify-between px-3.5 py-3 rounded-2xl text-sm font-medium transition-all touch-manipulation text-left ${
                         isActive
-                          ? "bg-primary/15 text-primary font-semibold border border-primary/25 shadow-2xs"
-                          : "text-foreground/80 hover:bg-muted/70 hover:text-foreground border border-transparent"
-                      } ${item.isSpecial && !isActive ? "text-primary/95" : ""}`}
+                          ? "bg-primary/15 text-primary font-semibold border border-primary/30 shadow-xs"
+                          : "text-foreground/85 hover:bg-muted/80 hover:text-foreground border border-transparent"
+                      } ${item.isSpecial && !isActive ? "text-primary font-medium" : ""}`}
                     >
-                      <div className="flex items-center gap-3 min-w-0">
-                        <span className={`grid h-8 w-8 shrink-0 place-items-center rounded-lg ${
+                      <div className="flex items-center gap-3.5 min-w-0">
+                        <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-xl transition-colors ${
                           isActive
-                            ? "bg-primary text-primary-foreground"
+                            ? "bg-primary text-primary-foreground shadow-xs"
                             : item.isSpecial
                             ? "bg-primary/15 text-primary"
-                            : "bg-muted text-muted-foreground"
+                            : "bg-muted/80 text-muted-foreground"
                         }`}>
-                          <Icon className="h-4 w-4" />
+                          <Icon className="h-4.5 w-4.5" />
                         </span>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium leading-tight truncate">{item.label}</p>
-                          <p className="text-[11px] text-muted-foreground truncate">{item.desc}</p>
+                          <p className="text-xs text-muted-foreground truncate mt-0.5">{item.desc}</p>
                         </div>
                       </div>
-                      {item.isSpecial && (
-                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 border-primary/40 text-primary shrink-0 ml-2">
+                      {item.isSpecial ? (
+                        <Badge variant="outline" className="text-[10px] px-2 py-0.5 border-primary/40 text-primary shrink-0 ml-2 font-semibold">
                           Studio
                         </Badge>
+                      ) : (
+                        <ChevronRight className={`h-4 w-4 shrink-0 transition-opacity ${isActive ? "text-primary opacity-100" : "text-muted-foreground/40 opacity-0 group-hover:opacity-100"}`} />
                       )}
                     </button>
                   );
@@ -269,11 +281,11 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
             </div>
 
             {/* Public Educational & Site Pages */}
-            <div className="pt-2 border-t border-border/40">
-              <p className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground px-2 mb-2">
+            <div className="pt-3 border-t border-border/40">
+              <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground px-2 mb-2.5">
                 Public Exploration & Resources
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+              <div className="space-y-1.5">
                 {siteLinks.map((item) => {
                   const Icon = item.icon;
                   const isActive = location === item.href;
@@ -282,14 +294,23 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
                       key={item.href}
                       type="button"
                       onClick={() => handleLinkClick(item.href)}
-                      className={`min-h-[44px] flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium transition-colors touch-manipulation text-left ${
+                      className={`w-full min-h-[48px] flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-colors touch-manipulation text-left ${
                         isActive
                           ? "bg-primary/15 text-primary font-semibold border border-primary/20"
-                          : "text-foreground/75 hover:bg-muted/70 hover:text-foreground"
+                          : "text-foreground/80 hover:bg-muted/70 hover:text-foreground"
                       }`}
                     >
-                      <Icon className={`h-4 w-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`} />
-                      <span className="truncate">{item.label}</span>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className={`grid h-7 w-7 shrink-0 place-items-center rounded-lg ${
+                          isActive ? "bg-primary/20 text-primary" : "bg-muted text-muted-foreground"
+                        }`}>
+                          <Icon className="h-3.5 w-3.5" />
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm leading-tight truncate">{item.label}</p>
+                        </div>
+                      </div>
+                      <ChevronRight className={`h-3.5 w-3.5 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground/30"}`} />
                     </button>
                   );
                 })}
@@ -298,22 +319,22 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
           </div>
         </ScrollArea>
 
-        {/* Drawer Footer */}
-        <div className="p-3.5 sm:p-4 border-t border-border/60 bg-muted/25 flex items-center justify-between gap-3 text-xs text-muted-foreground">
+        {/* Drawer Footer with Spacious Touch Targets */}
+        <div className="p-4 border-t border-border/60 bg-muted/25 flex items-center justify-between gap-3 text-xs text-muted-foreground">
           <button
             type="button"
             onClick={() => handleLinkClick("/settings")}
-            className="flex items-center gap-1.5 hover:text-foreground transition-colors text-[11px] min-h-[36px] touch-manipulation"
+            className="flex items-center gap-2 hover:text-foreground transition-colors text-xs font-medium min-h-[44px] px-2.5 py-2 rounded-xl hover:bg-muted/60 touch-manipulation"
           >
-            <Settings className="h-3.5 w-3.5 text-primary" />
+            <Settings className="h-4 w-4 text-primary" />
             <span>Settings & Privacy</span>
           </button>
 
-          <div className="flex items-center gap-2.5 text-[11px]">
+          <div className="flex items-center gap-2 text-xs">
             <button
               type="button"
               onClick={() => handleLinkClick("/privacy")}
-              className="hover:text-foreground transition-colors"
+              className="hover:text-foreground transition-colors min-h-[44px] px-2 flex items-center touch-manipulation"
             >
               Privacy
             </button>
@@ -321,7 +342,7 @@ export function UnifiedMobileNav({ triggerClassName }: UnifiedMobileNavProps) {
             <button
               type="button"
               onClick={() => handleLinkClick("/terms")}
-              className="hover:text-foreground transition-colors"
+              className="hover:text-foreground transition-colors min-h-[44px] px-2 flex items-center touch-manipulation"
             >
               Terms
             </button>
