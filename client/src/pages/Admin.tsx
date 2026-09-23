@@ -666,47 +666,69 @@ export default function Admin() {
 
       {/* Header Bar */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl transition-all">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3.5 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
-          <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
-            <div className="lg:hidden shrink-0">
-              <UnifiedMobileNav />
+        <div className="mx-auto max-w-7xl px-3.5 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          {/* Top Bar on Mobile / Left Section on Desktop */}
+          <div className="flex items-center justify-between sm:justify-start gap-2 sm:gap-3.5 w-full sm:w-auto min-w-0">
+            <div className="flex items-center gap-2 min-w-0">
+              <div className="lg:hidden shrink-0">
+                <UnifiedMobileNav />
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setLocation("/dashboard")}
+                className="min-h-[42px] sm:min-h-[44px] gap-1.5 sm:gap-2 text-foreground/85 hover:text-foreground rounded-full border border-border/70 bg-card/80 hover:bg-muted px-3 sm:px-4 text-xs font-semibold touch-manipulation transition-all shadow-2xs shrink-0"
+              >
+                <ArrowLeft className="h-4 w-4 text-primary shrink-0" />
+                <span>Back</span>
+                <span className="hidden md:inline">to Workspace</span>
+              </Button>
             </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setLocation("/dashboard")}
-              className="min-h-[44px] gap-2 text-foreground/85 hover:text-foreground rounded-full border border-border/70 bg-card/80 hover:bg-muted px-3.5 sm:px-4 text-xs font-semibold touch-manipulation transition-all shadow-2xs"
-            >
-              <ArrowLeft className="h-4 w-4 text-primary shrink-0" />
-              <span className="hidden md:inline">Back to</span>
-              <span className="truncate max-w-[140px] sm:max-w-none">
-                {role === "coach"
-                  ? "Coach Dashboard"
-                  : role === "supporter"
-                  ? "Supporter Dashboard"
-                  : "Workspace Dashboard"}
-              </span>
-            </Button>
-            
-            <div className="flex items-center gap-3 min-w-0">
-              <span className="grid h-10 w-10 sm:h-11 sm:w-11 shrink-0 place-items-center rounded-2xl bg-primary/15 text-primary shadow-xs ring-1 ring-primary/25">
-                <ShieldCheck className="h-5 w-5 sm:h-6 sm:w-6" />
-              </span>
-              <div className="min-w-0">
-                <h1 className="burnt-wood-heading font-serif text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight text-foreground leading-tight truncate">
-                  Admin Control & Content Studio
-                </h1>
-                <p className="text-xs text-muted-foreground hidden sm:flex items-center gap-2 mt-0.5">
-                  <span>Full CRUD authority</span>
-                  <span>•</span>
-                  <span>21 Dimensions, guides, boundaries, community & users</span>
-                </p>
-              </div>
+            {/* Mobile-only Quick Status & Reset Actions in Header Top Row */}
+            <div className="flex sm:hidden items-center gap-1.5 shrink-0">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  setPendingDestructive({
+                    kind: "resetAll",
+                    label: "Reset all demo content to factory defaults",
+                  })
+                }
+                className="h-9 px-2.5 rounded-full text-[11px] gap-1 border-border/80 text-muted-foreground hover:text-foreground shrink-0"
+                title="Reset demo data"
+              >
+                <RotateCcw className="h-3 w-3" />
+                <span>Reset</span>
+              </Button>
+              <Badge className="rounded-full bg-primary/15 text-primary border-primary/30 px-2 py-0.5 text-[10px] gap-1 font-semibold shrink-0">
+                <Sparkles className="h-2.5 w-2.5" />
+                Admin
+              </Badge>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* Title Area: Mobile Dedicated Full-Width Row / Desktop Inline */}
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1 sm:px-2">
+            <span className="grid h-9 w-9 sm:h-10 sm:w-10 shrink-0 place-items-center rounded-xl bg-primary/15 text-primary shadow-xs ring-1 ring-primary/20">
+              <ShieldCheck className="h-4.5 w-4.5 sm:h-5 sm:w-5" />
+            </span>
+            <div className="min-w-0 flex-1">
+              <h1 className="burnt-wood-heading font-serif text-lg sm:text-2xl font-bold tracking-tight text-foreground leading-tight truncate">
+                Admin Control & Content Studio
+              </h1>
+              <p className="text-[11px] sm:text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5 truncate">
+                <span className="text-primary font-medium">Full CRUD authority</span>
+                <span className="hidden xs:inline text-muted-foreground/50">•</span>
+                <span className="hidden xs:inline truncate">21 Dimensions, guides, community & users</span>
+              </p>
+            </div>
+          </div>
+
+          {/* Desktop Right Actions */}
+          <div className="hidden sm:flex items-center gap-2 shrink-0">
             <Button
               variant="outline"
               size="sm"
@@ -716,13 +738,13 @@ export default function Admin() {
                   label: "Reset all demo content to factory defaults",
                 })
               }
-              className="rounded-full text-xs gap-1.5 border-border/80 text-muted-foreground hover:text-foreground"
+              className="rounded-full text-xs min-h-[40px] gap-1.5 border-border/80 text-muted-foreground hover:text-foreground"
               title="Reset all in-memory changes to clean initial sample data"
             >
               <RotateCcw className="h-3.5 w-3.5" />
               Reset Demo Data
             </Button>
-            <Badge className="rounded-full bg-primary/15 text-primary border-primary/30 px-3 py-1 text-xs gap-1.5 font-semibold">
+            <Badge className="rounded-full bg-primary/15 text-primary border-primary/30 px-3 py-1.5 text-xs gap-1.5 font-semibold">
               <Sparkles className="h-3 w-3" />
               Full Admin Privileges
             </Badge>
