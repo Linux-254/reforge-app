@@ -1,6 +1,7 @@
 import { trpc } from "@/lib/trpc";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { UnifiedMobileNav } from "@/components/UnifiedMobileNav";
 import {
   Card,
   CardContent,
@@ -665,8 +666,12 @@ export default function Admin() {
 
       {/* Header Bar */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl transition-all">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-3 sm:gap-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 py-3.5 sm:py-4 flex flex-wrap items-center justify-between gap-3 sm:gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
+            <div className="lg:hidden shrink-0">
+              <UnifiedMobileNav />
+            </div>
+
             <Button
               variant="ghost"
               size="sm"

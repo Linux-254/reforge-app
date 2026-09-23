@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useLocation } from "wouter";
+import { UnifiedMobileNav } from "@/components/UnifiedMobileNav";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -927,14 +928,9 @@ export default function GuestDemoWorkspace({
         <div className="min-w-0 flex-1 flex flex-col overflow-x-hidden">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-background/95 px-3 sm:px-6 backdrop-blur-md">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-              <button
-                type="button"
-                onClick={() => setMobileOpen(true)}
-                className="rounded-xl p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/70 hover:bg-muted lg:hidden shrink-0 touch-manipulation"
-                aria-label="Open navigation"
-              >
-                <Menu className="h-5 w-5" />
-              </button>
+              <div className="lg:hidden shrink-0">
+                <UnifiedMobileNav />
+              </div>
               
               <button
                 type="button"

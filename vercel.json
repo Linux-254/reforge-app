@@ -1,5 +1,7 @@
 {
+  "buildCommand": "vite build",
   "outputDirectory": "dist/public",
+  "framework": "vite",
   "rewrites": [
     {
       "source": "/(.*)",
@@ -7,3 +9,4 @@
     }
   ]
 }
+

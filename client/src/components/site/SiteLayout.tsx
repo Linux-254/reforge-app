@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Leaf, Menu, ArrowUpRight, X, Sparkles, ShieldCheck, Compass, User, HeartHandshake, Stethoscope } from "lucide-react";
+import { Leaf, ArrowUpRight, Sparkles, ShieldCheck, User, HeartHandshake, Stethoscope } from "lucide-react";
 import { BrandLogoIcon } from "@/components/BrandLogo";
 import { useDemoSession, DemoRole } from "@/lib/demoSession";
+import { UnifiedMobileNav } from "@/components/UnifiedMobileNav";
 
 const navLinks = [
   { href: "/how-it-works", label: "How it works" },
@@ -134,71 +135,12 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               </Link>
             </Button>
 
-            {/* Mobile Menu Toggle Button */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="grid h-9 w-9 place-items-center rounded-xl border border-border/70 bg-card/60 text-foreground/80 hover:bg-muted lg:hidden"
-              aria-label="Toggle navigation menu"
-            >
-              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
+            {/* Mobile Responsive Hamburger Drawer (Consistent Across All Page Types) */}
+            <div className="lg:hidden">
+              <UnifiedMobileNav />
+            </div>
           </div>
         </div>
-
-        {/* Mobile Slide-Down Menu */}
-        {mobileMenuOpen && (
-          <div className="border-b border-border/70 bg-background/95 backdrop-blur-2xl px-6 py-5 lg:hidden animate-in slide-in-from-top-2 duration-200">
-            <nav className="flex flex-col space-y-3" aria-label="Mobile navigation">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="text-sm font-medium text-foreground/80 hover:text-primary py-1 border-b border-border/30"
-                >
-                  {link.label}
-                </Link>
-              ))}
-              <div className="pt-2 flex flex-col gap-2">
-                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Launch As Persona:</p>
-                <div className="grid grid-cols-2 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => { setMobileMenuOpen(false); launchAsRole("member"); }}
-                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
-                  >
-                    👤 Member (Sam)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setMobileMenuOpen(false); launchAsRole("supporter"); }}
-                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
-                  >
-                    🤝 Supporter (Sarah)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setMobileMenuOpen(false); launchAsRole("coach"); }}
-                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
-                  >
-                    🩺 Coach (Marcus)
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => { setMobileMenuOpen(false); launchAsRole("admin"); }}
-                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
-                  >
-                    🛡️ Admin (Alex)
-                  </button>
-                </div>
-                <Button asChild className="w-full rounded-full text-xs font-semibold mt-2" onClick={() => setMobileMenuOpen(false)}>
-                  <Link href="/dashboard">Enter Demo Workspace</Link>
-                </Button>
-              </div>
-            </nav>
-          </div>
-        )}
       </header>
 
       <main className="flex-1">{children}</main>

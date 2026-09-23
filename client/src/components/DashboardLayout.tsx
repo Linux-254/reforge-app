@@ -1,3 +1,4 @@
+import { UnifiedMobileNav } from "@/components/UnifiedMobileNav";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -241,7 +242,16 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
       <SidebarInset className="min-w-0 bg-background overflow-x-hidden">
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-background/95 px-3 sm:px-4 backdrop-blur-md">
           <div className="flex items-center gap-2 min-w-0">
-            <SidebarTrigger className="h-10 w-10 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center touch-manipulation" />
+            {/* Desktop Sidebar Trigger */}
+            <div className="hidden lg:block">
+              <SidebarTrigger className="h-10 w-10 min-h-[44px] min-w-[44px] rounded-xl flex items-center justify-center touch-manipulation" />
+            </div>
+
+            {/* Mobile/Tablet Hamburger Menu */}
+            <div className="lg:hidden">
+              <UnifiedMobileNav />
+            </div>
+
             <span className="font-serif text-base sm:text-lg font-bold truncate">{activeMenuItem?.label ?? "ReForge"}</span>
           </div>
 
