@@ -778,7 +778,7 @@ export default function GuestDemoWorkspace({
   const [location, setLocation] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
-  const { role, user } = useDemoSession();
+  const { role, setRole, user } = useDemoSession();
 
   const notify = (message: string) => {
     setToastMsg(message);
