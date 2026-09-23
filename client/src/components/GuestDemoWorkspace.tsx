@@ -107,36 +107,36 @@ function MemberOverviewContent({
   const [, setLocation] = useLocation();
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       {/* Hero Welcome Banner */}
-      <section className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-[#2b3a2e] text-[#f7eddc] shadow-[0_24px_60px_-40px_rgba(39,58,43,.8)]">
+      <section className="relative overflow-hidden rounded-[1.75rem] sm:rounded-[2rem] border border-border/60 bg-[#2b3a2e] text-[#f7eddc] shadow-[0_24px_60px_-40px_rgba(39,58,43,.8)]">
         <img
           src="/assets/hero-dawn.jpg"
           alt=""
           className="absolute inset-0 h-full w-full object-cover opacity-30 blur-[1px]"
         />
         <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(39,58,43,.96),rgba(39,58,43,.7),rgba(118,74,48,.25))]" />
-        <div className="relative p-6 sm:p-10 space-y-4 max-w-2xl">
+        <div className="relative p-5 sm:p-8 md:p-10 space-y-3.5 sm:space-y-4 max-w-2xl">
           <Badge className="rounded-full bg-primary/20 text-emerald-200 border-primary/30 gap-1.5 px-3 py-1 text-xs">
             <Sparkles className="h-3.5 w-3.5" /> Day 48 · Gentle Practice
           </Badge>
-          <h1 className="font-serif text-3xl sm:text-5xl leading-tight">
+          <h1 className="font-serif text-2xl sm:text-4xl md:text-5xl leading-tight">
             Welcome back, Sam.
           </h1>
-          <p className="text-white/80 text-sm sm:text-base leading-relaxed">
+          <p className="text-white/80 text-xs sm:text-sm md:text-base leading-relaxed">
             You do not have to conquer the whole journey today. Notice what is here right now, honor one clear boundary, and let that be enough.
           </p>
-          <div className="flex flex-wrap gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-2">
             <Button
               onClick={() => setLocation("/check-ins")}
-              className="rounded-full bg-[#f2d39c] text-[#2b3a2e] hover:bg-[#f6dfb1] font-semibold gap-2 shadow-sm"
+              className="rounded-full bg-[#f2d39c] text-[#2b3a2e] hover:bg-[#f6dfb1] font-semibold gap-2 shadow-sm min-h-[44px]"
             >
               Begin Morning Check-In <ArrowRight className="h-4 w-4" />
             </Button>
             <Button
               variant="outline"
               onClick={() => setLocation("/journal")}
-              className="rounded-full border-white/30 bg-white/10 text-white hover:bg-white/20"
+              className="rounded-full border-white/30 bg-white/10 text-white hover:bg-white/20 min-h-[44px]"
             >
               Write Reflection
             </Button>
@@ -147,64 +147,64 @@ function MemberOverviewContent({
       {/* Sobriety Streak Counter with Circular Progress */}
       <SobrietyStreakCounter initialStartDate="2026-08-01" />
 
-      {/* Vital Pulse Cards */}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Vital Pulse Cards - 2x2 on Mobile, 4 Cols on Desktop */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <Card className="nature-card border-border/70 bg-card/85 backdrop-blur-md">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between text-muted-foreground text-xs uppercase tracking-wider">
-              <span>Today's Check-In</span>
-              <HeartPulse className="h-4 w-4 text-primary" />
+          <CardContent className="p-3.5 sm:p-5">
+            <div className="flex items-center justify-between text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider">
+              <span className="truncate">Check-In</span>
+              <HeartPulse className="h-4 w-4 text-primary shrink-0" />
             </div>
-            <p className="font-serif text-2xl font-bold text-foreground mt-2">
+            <p className="font-serif text-xl sm:text-2xl font-bold text-foreground mt-1.5 sm:mt-2">
               {checkedIn ? "Completed" : "Awaiting"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {checkedIn ? "Saved at 7:30 AM" : "Name what is present today"}
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
+              {checkedIn ? "Saved today" : "Name what is present"}
             </p>
           </CardContent>
         </Card>
 
         <Card className="nature-card border-border/70 bg-card/85 backdrop-blur-md">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between text-muted-foreground text-xs uppercase tracking-wider">
-              <span>Private Journal</span>
-              <BookOpen className="h-4 w-4 text-amber-600" />
+          <CardContent className="p-3.5 sm:p-5">
+            <div className="flex items-center justify-between text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider">
+              <span className="truncate">Journal</span>
+              <BookOpen className="h-4 w-4 text-amber-600 shrink-0" />
             </div>
-            <p className="font-serif text-2xl font-bold text-foreground mt-2">
+            <p className="font-serif text-xl sm:text-2xl font-bold text-foreground mt-1.5 sm:mt-2">
               {entriesCount} {entriesCount === 1 ? "page" : "pages"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              Local to this browser only
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
+              Local sandbox
             </p>
           </CardContent>
         </Card>
 
         <Card className="nature-card border-border/70 bg-card/85 backdrop-blur-md">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between text-muted-foreground text-xs uppercase tracking-wider">
-              <span>Next Goal Step</span>
-              <Goal className="h-4 w-4 text-emerald-600" />
+          <CardContent className="p-3.5 sm:p-5">
+            <div className="flex items-center justify-between text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider">
+              <span className="truncate">Goal Step</span>
+              <Goal className="h-4 w-4 text-emerald-600 shrink-0" />
             </div>
-            <p className="font-serif text-2xl font-bold text-foreground mt-2">
-              {goalStep ? "Accomplished" : "Step 1 Ready"}
+            <p className="font-serif text-xl sm:text-2xl font-bold text-foreground mt-1.5 sm:mt-2">
+              {goalStep ? "Accomplished" : "Step 1"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              {goalStep ? "Steadiness maintained" : "Prepare tomorrow tonight"}
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
+              {goalStep ? "Steadiness kept" : "Tomorrow night prep"}
             </p>
           </CardContent>
         </Card>
 
         <Card className="nature-card border-border/70 bg-card/85 backdrop-blur-md">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between text-muted-foreground text-xs uppercase tracking-wider">
-              <span>Active Boundary</span>
-              <ShieldCheck className="h-4 w-4 text-primary" />
+          <CardContent className="p-3.5 sm:p-5">
+            <div className="flex items-center justify-between text-muted-foreground text-[10px] sm:text-xs uppercase tracking-wider">
+              <span className="truncate">Boundary</span>
+              <ShieldCheck className="h-4 w-4 text-primary shrink-0" />
             </div>
-            <p className="font-serif text-2xl font-bold text-foreground mt-2">
+            <p className="font-serif text-xl sm:text-2xl font-bold text-foreground mt-1.5 sm:mt-2">
               {ruleKept ? "Reviewed" : "Active"}
             </p>
-            <p className="text-xs text-muted-foreground mt-1">
-              No decisions while overwhelmed
+            <p className="text-[11px] sm:text-xs text-muted-foreground mt-0.5 sm:mt-1 truncate">
+              No hurried decisions
             </p>
           </CardContent>
         </Card>
@@ -961,7 +961,7 @@ export default function GuestDemoWorkspace({
             </div>
           </header>
 
-          <main className="mx-auto max-w-6xl w-full p-4 sm:p-6 lg:p-8 flex-1 pb-24 lg:pb-8">
+          <main className="mx-auto max-w-6xl w-full p-3.5 sm:p-6 lg:p-8 flex-1 pb-28 lg:pb-8">
             {role === "supporter" && path === "/dashboard" ? (
               <SupporterDashboard />
             ) : role === "coach" && path === "/dashboard" ? (

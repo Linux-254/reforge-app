@@ -260,7 +260,7 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
           </div>
         </header>
 
-        <main className="min-h-[calc(100vh-3.5rem)] p-4 sm:p-6 lg:p-8 pb-24 lg:pb-8">{children}</main>
+        <main className="min-h-[calc(100vh-3.5rem)] p-3.5 sm:p-6 lg:p-8 pb-28 lg:pb-8">{children}</main>
       </SidebarInset>
 
       {/* Mobile Sticky Bottom Navigation Bar with >=44px Touch Targets */}

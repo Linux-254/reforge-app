@@ -87,31 +87,31 @@ export function SobrietyStreakCounter({
       id="sobriety-streak-card"
       className={`nature-card border-border/70 bg-card/90 backdrop-blur-md overflow-hidden ${className}`}
     >
-      <CardHeader className="p-5 pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="grid h-7 w-7 place-items-center rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400">
+      <CardHeader className="p-4 sm:p-5 pb-2 sm:pb-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-emerald-500/15 text-emerald-700 dark:text-emerald-400">
               <Award className="h-4 w-4" />
             </span>
-            <div>
-              <CardTitle className="font-serif text-lg font-bold leading-tight">
+            <div className="min-w-0">
+              <CardTitle className="font-serif text-base sm:text-lg font-bold leading-tight truncate">
                 Sobriety Rhythm
               </CardTitle>
-              <p className="text-[11px] text-muted-foreground">
+              <p className="text-[10px] sm:text-[11px] text-muted-foreground truncate">
                 Honoring each day clean & clear
               </p>
             </div>
           </div>
           <Badge
             variant="outline"
-            className="rounded-full text-[10px] px-2 py-0.5 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 font-semibold"
+            className="rounded-full text-[10px] px-2 py-0.5 border-emerald-500/30 text-emerald-700 dark:text-emerald-400 bg-emerald-500/10 font-semibold shrink-0"
           >
             <Sparkles className="h-3 w-3 mr-1" /> Active Streak
           </Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="p-5 pt-0 space-y-4">
+      <CardContent className="p-4 sm:p-5 pt-0 space-y-4">
         {/* Circular Progress & Days Display */}
         <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-2">
           {/* Circular Progress Ring */}

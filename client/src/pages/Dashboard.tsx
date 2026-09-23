@@ -253,50 +253,50 @@ function DashboardInner() {
               className="absolute inset-0 h-full w-full object-cover opacity-35"
             />
             <div className="absolute inset-0 bg-[linear-gradient(110deg,rgba(39,58,43,.98),rgba(39,58,43,.66),rgba(118,74,48,.2))]" />
-            <div className="relative grid gap-8 p-7 sm:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
-              <div className="max-w-2xl space-y-4">
+            <div className="relative grid gap-6 sm:gap-8 p-5 sm:p-8 md:p-10 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div className="max-w-2xl space-y-3 sm:space-y-4">
                 <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">
                   <Sparkles className="h-4 w-4" /> Your daily landing place
                 </p>
-                <h1 className="font-serif text-4xl leading-tight sm:text-6xl">
+                <h1 className="font-serif text-2xl sm:text-4xl lg:text-5xl leading-tight">
                   Welcome back, {displayName}.
                 </h1>
-                <p className="max-w-xl text-sm leading-7 text-white/76 sm:text-base">
+                <p className="max-w-xl text-xs sm:text-sm md:text-base leading-relaxed text-white/80">
                   You do not have to solve the whole life today. Notice the next honest thing, then let that be enough for this morning.
                 </p>
-                <div className="flex flex-wrap gap-3 pt-2">
+                <div className="flex flex-col sm:flex-row gap-2.5 sm:gap-3 pt-2">
                   <Button
                     onClick={() => setLocation("/check-ins")}
-                    className="rounded-full bg-[#f2d39c] text-[#304333] hover:bg-[#f6dfb1]"
+                    className="rounded-full bg-[#f2d39c] text-[#304333] hover:bg-[#f6dfb1] min-h-[44px] font-semibold"
                   >
                     Begin today <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
                   <Button
                     variant="outline"
                     onClick={() => setLocation("/progress")}
-                    className="rounded-full border-white/25 bg-white/5 text-white hover:bg-white/12 hover:text-white"
+                    className="rounded-full border-white/25 bg-white/5 text-white hover:bg-white/12 hover:text-white min-h-[44px]"
                   >
                     See my map
                   </Button>
                 </div>
               </div>
-              <div className="grid min-w-[220px] gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                <div className="rounded-2xl border border-white/15 bg-black/10 p-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-white/65">
-                    <Flame className="h-4 w-4 text-amber-200" /> Current rhythm
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-1 gap-2.5 sm:gap-3 min-w-[200px]">
+                <div className="rounded-2xl border border-white/15 bg-black/15 p-3.5 sm:p-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-xs uppercase tracking-[0.14em] text-white/70">
+                    <Flame className="h-3.5 w-3.5 text-amber-200 shrink-0" /> Current rhythm
                   </div>
-                  <p className="mt-2 font-serif text-4xl">
+                  <p className="mt-1.5 sm:mt-2 font-serif text-2xl sm:text-4xl">
                     {currentStreak}
-                    <span className="ml-2 text-base text-white/65">days</span>
+                    <span className="ml-1.5 text-xs sm:text-base text-white/65">days</span>
                   </p>
                 </div>
-                <div className="rounded-2xl border border-white/15 bg-black/10 p-4 backdrop-blur-sm">
-                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-white/65">
-                    <TrendingUp className="h-4 w-4 text-amber-200" /> Longest rhythm
+                <div className="rounded-2xl border border-white/15 bg-black/15 p-3.5 sm:p-4 backdrop-blur-sm">
+                  <div className="flex items-center gap-1.5 text-[10px] sm:text-xs uppercase tracking-[0.14em] text-white/70">
+                    <TrendingUp className="h-3.5 w-3.5 text-amber-200 shrink-0" /> Longest rhythm
                   </div>
-                  <p className="mt-2 font-serif text-4xl">
+                  <p className="mt-1.5 sm:mt-2 font-serif text-2xl sm:text-4xl">
                     {longestStreak}
-                    <span className="ml-2 text-base text-white/65">days</span>
+                    <span className="ml-1.5 text-xs sm:text-base text-white/65">days</span>
                   </p>
                 </div>
               </div>
