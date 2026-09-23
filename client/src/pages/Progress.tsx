@@ -210,43 +210,45 @@ export default function Progress() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={chartData}
-                  margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
-                  <XAxis
-                    dataKey="name"
-                    tick={{ fontSize: 11 }}
-                    interval={0}
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                  />
-                  <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
-                  <Tooltip />
-                  <Bar
-                    dataKey="value"
-                    radius={[6, 6, 0, 0]}
-                    onClick={data => {
-                      const entry = data as unknown as
-                        | { dimensionId: number }
-                        | undefined;
-                      if (entry?.dimensionId) setSelectedId(entry.dimensionId);
-                    }}
+            <div className="overflow-x-auto pb-2 -mx-2 px-2 sm:mx-0 sm:px-0">
+              <div className="h-80 min-w-[560px] sm:min-w-full">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart
+                    data={chartData}
+                    margin={{ top: 8, right: 8, left: -20, bottom: 0 }}
                   >
-                    {chartData.map(entry => (
-                      <Cell
-                        key={entry.dimensionId}
-                        fill={BAR_COLORS[entry.dimensionId % BAR_COLORS.length]}
-                        cursor="pointer"
-                      />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e7e5e4" />
+                    <XAxis
+                      dataKey="name"
+                      tick={{ fontSize: 11 }}
+                      interval={0}
+                      angle={-45}
+                      textAnchor="end"
+                      height={80}
+                    />
+                    <YAxis domain={[0, 100]} tick={{ fontSize: 11 }} />
+                    <Tooltip />
+                    <Bar
+                      dataKey="value"
+                      radius={[6, 6, 0, 0]}
+                      onClick={data => {
+                        const entry = data as unknown as
+                          | { dimensionId: number }
+                          | undefined;
+                        if (entry?.dimensionId) setSelectedId(entry.dimensionId);
+                      }}
+                    >
+                      {chartData.map(entry => (
+                        <Cell
+                          key={entry.dimensionId}
+                          fill={BAR_COLORS[entry.dimensionId % BAR_COLORS.length]}
+                          cursor="pointer"
+                        />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -266,13 +268,13 @@ export default function Progress() {
                   <button
                     key={s.dimensionId}
                     onClick={() => setSelectedId(s.dimensionId)}
-                    className={`text-left rounded-xl border p-3 transition-colors ${
+                    className={`text-left rounded-xl border p-3 min-h-[48px] transition-colors touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-primary ${
                       selectedId === s.dimensionId
                         ? "border-amber-500 bg-amber-50"
                         : "border-stone-200 bg-white hover:bg-stone-50"
                     }`}
                   >
-                    <div className="flex justify-between items-center mb-1">
+                    <div className="flex justify-between items-center mb-1.5">
                       <span className="text-sm font-medium text-stone-800">
                         {s.dimensionLabel}
                       </span>

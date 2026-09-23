@@ -135,7 +135,7 @@ export function DimensionsImprovementChart({
                 variant="ghost"
                 size="sm"
                 onClick={() => setActiveMetric(metric.key)}
-                className={`h-7 rounded-full text-xs font-medium px-3 transition-all ${
+                className={`min-h-[38px] sm:min-h-[32px] rounded-full text-xs font-medium px-3.5 transition-all touch-manipulation ${
                   isSelected
                     ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 hover:text-primary-foreground"
                     : "bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground"

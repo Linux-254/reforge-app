@@ -740,7 +740,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("dimensions")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "dimensions"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
@@ -756,7 +756,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("guides")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "guides"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
@@ -772,7 +772,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("rules")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "rules"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
@@ -788,7 +788,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("community")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "community"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
@@ -804,7 +804,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("users")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "users"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
@@ -820,7 +820,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("supporters")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "supporters"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
@@ -836,7 +836,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("newsletter")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "newsletter"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"
@@ -849,7 +849,7 @@ export default function Admin() {
           <button
             type="button"
             onClick={() => setActiveTab("logs")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 ${
+            className={`flex min-h-[44px] items-center gap-2 px-4 py-2.5 text-xs sm:text-sm rounded-full font-medium transition-all shrink-0 touch-manipulation ${
               activeTab === "logs"
                 ? "bg-primary text-primary-foreground shadow-sm"
                 : "text-muted-foreground hover:text-foreground hover:bg-muted/70"

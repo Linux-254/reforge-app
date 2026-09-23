@@ -924,13 +924,13 @@ export default function GuestDemoWorkspace({
         )}
 
         {/* Main Content Area */}
-        <div className="min-w-0 flex-1 flex flex-col">
+        <div className="min-w-0 flex-1 flex flex-col overflow-x-hidden">
           <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-background/95 px-3 sm:px-6 backdrop-blur-md">
-            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
               <button
                 type="button"
                 onClick={() => setMobileOpen(true)}
-                className="rounded-xl p-1.5 text-foreground/70 hover:bg-muted lg:hidden shrink-0"
+                className="rounded-xl p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-foreground/70 hover:bg-muted lg:hidden shrink-0 touch-manipulation"
                 aria-label="Open navigation"
               >
                 <Menu className="h-5 w-5" />
@@ -939,7 +939,7 @@ export default function GuestDemoWorkspace({
               <button
                 type="button"
                 onClick={() => setLocation("/dashboard")}
-                className="flex items-center gap-2 hover:opacity-85 transition-opacity shrink-0"
+                className="flex items-center gap-2 hover:opacity-85 transition-opacity shrink-0 min-h-[44px]"
               >
                 <BrandLogoIcon size={28} />
                 <span className="font-serif text-lg font-bold leading-none">
@@ -991,10 +991,10 @@ export default function GuestDemoWorkspace({
         />
       )}
 
-      {/* Mobile Sticky Bottom Navigation Bar */}
+      {/* Mobile Sticky Bottom Navigation Bar with >=44px Touch Targets */}
       <nav
         aria-label="Mobile quick navigation"
-        className="fixed bottom-0 left-0 right-0 z-30 flex h-16 items-center justify-around border-t border-border/70 bg-background/95 backdrop-blur-xl px-2 lg:hidden shadow-[0_-8px_25px_rgba(0,0,0,0.06)]"
+        className="fixed bottom-0 left-0 right-0 z-30 flex h-16 items-center justify-around border-t border-border/70 bg-background/95 backdrop-blur-xl px-1 sm:px-2 lg:hidden shadow-[0_-8px_25px_rgba(0,0,0,0.06)]"
       >
         <button
           type="button"
@@ -1002,7 +1002,7 @@ export default function GuestDemoWorkspace({
             setLocation("/dashboard");
             setMobileOpen(false);
           }}
-          className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
+          className={`flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[11px] font-medium transition-colors touch-manipulation ${
             path === "/dashboard"
               ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
@@ -1018,7 +1018,7 @@ export default function GuestDemoWorkspace({
             setLocation("/check-ins");
             setMobileOpen(false);
           }}
-          className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
+          className={`flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[11px] font-medium transition-colors touch-manipulation ${
             path === "/check-ins"
               ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
@@ -1034,7 +1034,7 @@ export default function GuestDemoWorkspace({
             setLocation("/progress");
             setMobileOpen(false);
           }}
-          className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
+          className={`flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[11px] font-medium transition-colors touch-manipulation ${
             path === "/progress"
               ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
@@ -1050,7 +1050,7 @@ export default function GuestDemoWorkspace({
             setLocation("/journal");
             setMobileOpen(false);
           }}
-          className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
+          className={`flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[11px] font-medium transition-colors touch-manipulation ${
             path === "/journal"
               ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
@@ -1066,7 +1066,7 @@ export default function GuestDemoWorkspace({
             setLocation("/goals");
             setMobileOpen(false);
           }}
-          className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
+          className={`flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[11px] font-medium transition-colors touch-manipulation ${
             path === "/goals"
               ? "text-primary font-semibold"
               : "text-muted-foreground hover:text-foreground"
@@ -1079,7 +1079,7 @@ export default function GuestDemoWorkspace({
         <button
           type="button"
           onClick={() => setMobileOpen((open) => !open)}
-          className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
+          className={`flex min-h-[48px] min-w-[48px] flex-col items-center justify-center gap-1 py-1 px-2 rounded-xl text-[11px] font-medium transition-colors touch-manipulation ${
             mobileOpen ? "text-primary font-semibold" : "text-muted-foreground hover:text-foreground"
           }`}
         >

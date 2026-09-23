@@ -115,7 +115,12 @@ export default function Guides() {
               const Icon = tabItem.icon;
               const active = tabItem.type === tab;
               return (
-                <Button key={tabItem.type} variant={active ? "default" : "outline"} onClick={() => setTab(tabItem.type)} className="gap-2">
+                <Button
+                  key={tabItem.type}
+                  variant={active ? "default" : "outline"}
+                  onClick={() => setTab(tabItem.type)}
+                  className="min-h-[44px] gap-2 touch-manipulation px-3.5"
+                >
                   <Icon className="h-4 w-4" /> {tabItem.label}
                 </Button>
               );
@@ -125,11 +130,11 @@ export default function Guides() {
             <label className="relative block">
               <span className="sr-only">Search guides</span>
               <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#58705a]" />
-              <Input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by need, practice, or keyword" className="border-[#203b2a]/15 bg-white/80 pl-9" />
+              <Input value={query} onChange={event => setQuery(event.target.value)} placeholder="Search by need, practice, or keyword" className="h-11 border-[#203b2a]/15 bg-white/80 pl-9" />
             </label>
             <label className="block">
               <span className="sr-only">Filter by life dimension</span>
-              <select value={dimension} onChange={event => setDimension(event.target.value)} className="h-10 w-full rounded-md border border-[#203b2a]/15 bg-white/80 px-3 text-sm text-[#203b2a] focus:outline-none focus:ring-2 focus:ring-[#416142]">
+              <select value={dimension} onChange={event => setDimension(event.target.value)} className="h-11 w-full rounded-md border border-[#203b2a]/15 bg-white/80 px-3 text-sm text-[#203b2a] focus:outline-none focus:ring-2 focus:ring-[#416142]">
                 <option value="">All dimensions</option>
                 {dimensions.map(item => <option key={item} value={item}>{item}</option>)}
               </select>
@@ -138,13 +143,36 @@ export default function Guides() {
         </section>
 
         {isLoading ? (
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"><Skeleton className="h-52" /><Skeleton className="h-52" /><Skeleton className="h-52" /></div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <Card key={i} className="border-[#203b2a]/10 bg-white/75 p-6 space-y-4">
+                <div className="flex items-center gap-2">
+                  <Skeleton className="h-5 w-24 rounded-full" />
+                  <Skeleton className="h-5 w-14 rounded-full" />
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-6 w-3/4 rounded-md" />
+                  <Skeleton className="h-4 w-full rounded-sm" />
+                  <Skeleton className="h-4 w-5/6 rounded-sm" />
+                </div>
+                <div className="pt-2 flex items-center justify-between">
+                  <Skeleton className="h-3.5 w-28 rounded-sm" />
+                  <Skeleton className="h-3.5 w-16 rounded-sm" />
+                </div>
+              </Card>
+            ))}
+          </div>
         ) : resources.length === 0 ? (
           <Card className="border-[#203b2a]/10 bg-white/70"><CardContent className="py-14 text-center"><BookOpen className="mx-auto mb-4 h-10 w-10 text-[#a05d3d]" /><p className="text-[#58705a]">No guides match this view yet. Try another dimension or search term.</p></CardContent></Card>
         ) : (
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {resources.map(resource => (
-              <button key={resource.id} type="button" onClick={() => setSelected(resource)} className="text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#416142] focus-visible:ring-offset-2">
+              <button
+                key={resource.id}
+                type="button"
+                onClick={() => setSelected(resource)}
+                className="text-left min-h-[44px] touch-manipulation focus:outline-none focus-visible:ring-2 focus-visible:ring-[#416142] focus-visible:ring-offset-2 rounded-2xl"
+              >
                 <Card className="h-full border-[#203b2a]/10 bg-white/75 transition-transform hover:-translate-y-1 hover:shadow-lg">
                   <CardHeader>
                     <div className="flex flex-wrap items-center gap-2"><Badge variant="outline" className="border-[#7c9567] text-[#416142]">{TYPE_LABEL[resource.type as ResourceType] ?? "Resource"}</Badge>{resource.duration && <Badge variant="secondary">{resource.duration}</Badge>}</div>
