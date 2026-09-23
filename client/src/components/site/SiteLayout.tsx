@@ -217,38 +217,9 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               <p className="mt-4 max-w-xs text-sm leading-6 text-white/70">
                 A gentle, evidence-based whole-life recovery companion for the honest work of becoming well again.
               </p>
-              <div className="mt-4 flex flex-col gap-2">
-                <p className="text-xs font-semibold text-[#f2d39c]/90 uppercase tracking-wider">Launch Persona Demos:</p>
-                <div className="flex flex-wrap gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => launchAsRole("member")}
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
-                  >
-                    👤 Member
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => launchAsRole("supporter")}
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
-                  >
-                    🤝 Supporter
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => launchAsRole("coach")}
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
-                  >
-                    🩺 Coach
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => launchAsRole("admin")}
-                    className="text-xs px-2.5 py-1 rounded-full bg-[#f2d39c]/20 hover:bg-[#f2d39c]/30 text-[#f2d39c] font-semibold transition-colors"
-                  >
-                    🛡️ Admin
-                  </button>
-                </div>
+              <div className="mt-5 flex items-center gap-2 text-xs text-white/60">
+                <span className="h-2 w-2 rounded-full bg-emerald-400" />
+                <span>Private, anonymous, whole-person recovery</span>
               </div>
             </div>
             {footerColumns.map((column) => (

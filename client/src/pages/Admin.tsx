@@ -666,15 +666,22 @@ export default function Admin() {
       {/* Header Bar */}
       <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-xl transition-all">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 py-4 flex flex-wrap items-center justify-between gap-4">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setLocation("/dashboard")}
-              className="gap-2 text-foreground/80 hover:text-foreground rounded-full"
+              className="min-h-[40px] gap-2 text-foreground/80 hover:text-foreground rounded-full border border-border/60 bg-card/60 hover:bg-muted/80 px-3.5 text-xs font-medium touch-manipulation transition-all"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Member Dashboard
+              <ArrowLeft className="h-4 w-4 text-primary" />
+              <span className="hidden sm:inline">Back to</span>
+              <span>
+                {role === "coach"
+                  ? "Coach Dashboard"
+                  : role === "supporter"
+                  ? "Supporter Dashboard"
+                  : "Workspace Dashboard"}
+              </span>
             </Button>
             <div className="flex items-center gap-2.5">
               <span className="grid h-9 w-9 place-items-center rounded-full bg-primary/15 text-primary shadow-sm">
