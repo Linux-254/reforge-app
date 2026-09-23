@@ -159,10 +159,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               <p className="mt-4 max-w-xs text-sm leading-6 text-white/70">
                 A gentle, evidence-based whole-life recovery companion for the honest work of becoming well again.
               </p>
-              <div className="mt-5 flex items-center gap-2 text-xs text-white/60">
-                <span className="h-2 w-2 rounded-full bg-emerald-400" />
-                <span>Private, anonymous, whole-person recovery</span>
-              </div>
             </div>
             {footerColumns.map((column) => (
               <div key={column.heading}>
