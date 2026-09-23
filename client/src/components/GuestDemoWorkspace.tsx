@@ -966,7 +966,17 @@ export default function GuestDemoWorkspace({
           </header>
 
           <main className="mx-auto max-w-6xl w-full p-4 sm:p-6 lg:p-8 flex-1 pb-24 lg:pb-8">
-            <DemoContent path={path} notify={notify} />
+            {role === "supporter" && path === "/dashboard" ? (
+              <SupporterDashboard />
+            ) : role === "coach" && path === "/dashboard" ? (
+              <CoachDashboard />
+            ) : role === "admin" && path === "/dashboard" ? (
+              <AdminHubOverview />
+            ) : _children ? (
+              _children
+            ) : (
+              <DemoContent path={path} notify={notify} />
+            )}
           </main>
         </div>
       </div>

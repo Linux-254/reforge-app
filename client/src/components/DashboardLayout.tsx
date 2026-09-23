@@ -57,9 +57,11 @@ const menuItems = [
   { icon: Goal, label: "Goals", path: "/goals" },
   { icon: ShieldCheck, label: "Boundaries", path: "/rules" },
   { icon: Compass, label: "Guides", path: "/guides" },
+  { icon: Users, label: "Community Circle", path: "/community" },
   { icon: Music2, label: "Music reset", path: "/music" },
   { icon: Sparkles, label: "Devotional", path: "/devotional" },
   { icon: FileHeart, label: "Newsletter", path: "/newsletter" },
+  { icon: Settings, label: "Settings", path: "/settings" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
