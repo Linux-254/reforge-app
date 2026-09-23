@@ -45,6 +45,7 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import GuestDemoWorkspace from "./GuestDemoWorkspace";
 import { Button } from "./ui/button";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useAuth } from "@/_core/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 
@@ -243,15 +244,7 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
           </div>
 
           <div className="flex items-center gap-2">
-            <Button
-              type="button"
-              size="sm"
-              onClick={() => setLocation("/presentation")}
-              className="h-9 rounded-full bg-primary text-primary-foreground font-bold text-xs px-3.5 sm:px-4 gap-2 shadow-md hover:scale-102 transition-all ring-2 ring-primary/30"
-            >
-              <Compass className="h-4 w-4 text-amber-300" />
-              <span className="font-bold">Presentation Deck</span>
-            </Button>
+            <ThemeToggle compact />
           </div>
         </header>
 
@@ -317,15 +310,15 @@ function DashboardLayoutContent({ children, setSidebarWidth }: DashboardLayoutCo
 
         <button
           type="button"
-          onClick={() => setLocation("/presentation")}
+          onClick={() => setLocation("/goals")}
           className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
-            location === "/presentation"
-              ? "text-amber-600 dark:text-amber-400 font-semibold"
-              : "text-amber-700/75 dark:text-amber-300/75 hover:text-amber-600"
+            location === "/goals"
+              ? "text-primary font-semibold"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <Compass className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          <span>Deck</span>
+          <Goal className="h-5 w-5" />
+          <span>Goals</span>
         </button>
       </nav>
     </>

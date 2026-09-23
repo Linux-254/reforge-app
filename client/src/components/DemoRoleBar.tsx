@@ -61,15 +61,6 @@ export function DemoRoleBar({ compact = false }: DemoRoleBarProps) {
           <Badge variant="outline" className="gap-1 rounded-full border-primary/30 bg-primary/10 text-primary font-bold px-2.5 py-0.5">
             <Sparkles className="h-3 w-3" /> Demo Sandbox
           </Badge>
-          <Button
-            size="sm"
-            variant="default"
-            onClick={() => setLocation("/presentation")}
-            className="h-7 rounded-full text-[11px] gap-1 bg-primary text-primary-foreground font-bold px-3 shadow-xs hover:scale-102 transition-transform"
-          >
-            <Compass className="h-3.5 w-3.5" />
-            <span>Presentation Deck</span>
-          </Button>
           <span className="hidden xl:inline text-muted-foreground text-[11px]">
             · Switch roles to test all perspectives:
           </span>

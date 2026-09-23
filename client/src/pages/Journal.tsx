@@ -61,9 +61,49 @@ export default function Journal() {
 
   if (listQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <Skeleton className="h-96 w-full" />
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100" aria-label="Loading your journal">
+        {/* Top bar skeleton */}
+        <div className="bg-white border-b border-slate-200">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
+            <Skeleton className="h-9 w-20 rounded-md" />
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-28 rounded-md" />
+              <Skeleton className="h-4 w-48 rounded-sm" />
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+          {/* New Entry Card Skeleton */}
+          <Card>
+            <CardHeader className="space-y-2">
+              <Skeleton className="h-6 w-32 rounded-md" />
+              <Skeleton className="h-4 w-72 rounded-sm" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-32 w-full rounded-md" />
+              <Skeleton className="h-10 w-32 rounded-md" />
+            </CardContent>
+          </Card>
+
+          {/* Entry Cards List Skeleton */}
+          <div className="space-y-4">
+            {[1, 2, 3].map((i) => (
+              <Card key={i}>
+                <CardContent className="pt-6 space-y-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2 flex-1">
+                      <Skeleton className="h-4 w-36 rounded-sm" />
+                      <Skeleton className="h-4 w-full rounded-sm" />
+                      <Skeleton className="h-4 w-5/6 rounded-sm" />
+                      <Skeleton className="h-4 w-2/3 rounded-sm" />
+                    </div>
+                    <Skeleton className="h-8 w-8 rounded-md shrink-0" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );

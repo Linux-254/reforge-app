@@ -46,6 +46,7 @@ import {
 import Guides from "@/pages/Guides";
 import Community from "@/pages/Community";
 import { DemoRoleBar } from "@/components/DemoRoleBar";
+import ThemeToggle from "@/components/ThemeToggle";
 import { useDemoSession } from "@/lib/demoSession";
 import { SupporterDashboard } from "@/components/SupporterDashboard";
 import { CoachDashboard } from "@/components/CoachDashboard";
@@ -54,7 +55,6 @@ import { DimensionsImprovementChart } from "@/components/DimensionsImprovementCh
 import { BrandLogoIcon } from "@/components/BrandLogo";
 
 const navItems = [
-  { path: "/presentation", label: "Presentation Deck", icon: Compass, featured: true },
   { path: "/dashboard", label: "Overview", icon: Home },
   { path: "/check-ins", label: "Today", icon: HeartPulse },
   { path: "/progress", label: "Progress", icon: TrendingUp },
@@ -777,7 +777,6 @@ export default function GuestDemoWorkspace({
   const [location, setLocation] = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [toastMsg, setToastMsg] = useState("");
-  const [isPageLoading, setIsPageLoading] = useState(false);
   const { role, user } = useDemoSession();
 
   const notify = (message: string) => {
@@ -787,14 +786,11 @@ export default function GuestDemoWorkspace({
 
   const path = useMemo(() => location.split("?")[0], [location]);
 
-  useEffect(() => {
-    setIsPageLoading(true);
-    const timer = setTimeout(() => setIsPageLoading(false), 140);
-    return () => clearTimeout(timer);
-  }, [path]);
-
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      {/* Global Interactive Demo Role Switcher at the very top */}
+      <DemoRoleBar />
+
       <div className="flex flex-1 min-h-0">
         {/* Desktop Sidebar with Frosted Glass */}
         <aside
@@ -828,29 +824,51 @@ export default function GuestDemoWorkspace({
                 <X className="h-5 w-5" />
               </button>
             </div>
-
-            {/* Immediate Presentation Link Near Logo */}
-            <button
-              type="button"
-              onClick={() => {
-                setLocation("/presentation");
-                setMobileOpen(false);
-              }}
-              className="flex items-center justify-center gap-2 w-full py-1.5 px-3 rounded-full bg-primary/15 hover:bg-primary/25 text-primary font-bold text-xs transition-all border border-primary/30 shadow-xs"
-            >
-              <Compass className="h-3.5 w-3.5" />
-              <span>Presentation Deck</span>
-            </button>
           </div>
 
-          {/* Active User Card in Sidebar */}
-          <div className="my-3 p-2.5 rounded-xl border border-sidebar-border/60 bg-sidebar-accent/50 flex items-center gap-2.5 text-xs">
-            <div className="h-8 w-8 rounded-full bg-primary/20 text-primary grid place-items-center font-bold font-serif shrink-0">
-              {user.avatar}
+          {/* Active User & Role Switcher Card in Sidebar */}
+          <div className="my-3 p-3 rounded-2xl border border-sidebar-border/70 bg-sidebar-accent/50 space-y-2.5">
+            <div className="flex items-center gap-2.5 text-xs">
+              <div className="h-9 w-9 rounded-full bg-primary/20 text-primary grid place-items-center font-bold font-serif shrink-0 border border-primary/30">
+                {user.avatar}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="font-semibold text-sidebar-foreground truncate">{user.name}</p>
+                <p className="text-[10px] text-sidebar-foreground/70 capitalize font-medium">{user.role} role</p>
+              </div>
             </div>
-            <div className="min-w-0">
-              <p className="font-semibold text-sidebar-foreground truncate">{user.name}</p>
-              <p className="text-[10px] text-sidebar-foreground/60 capitalize">{user.role} role</p>
+            {/* Interactive role switcher pills */}
+            <div className="grid grid-cols-2 gap-1 pt-1">
+              {[
+                { id: "member" as const, label: "Member" },
+                { id: "supporter" as const, label: "Supporter" },
+                { id: "coach" as const, label: "Coach" },
+                { id: "admin" as const, label: "Admin" },
+              ].map((r) => {
+                const isCurrent = role === r.id;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => {
+                      setRole(r.id);
+                      if (r.id === "admin") {
+                        setLocation("/admin");
+                      } else if (path === "/admin") {
+                        setLocation("/dashboard");
+                      }
+                      notify(`Switched to ${r.label} perspective`);
+                    }}
+                    className={`py-1 px-2 rounded-lg text-[11px] font-medium transition-all text-center ${
+                      isCurrent
+                        ? "bg-primary text-primary-foreground font-semibold shadow-xs"
+                        : "bg-sidebar/60 text-sidebar-foreground/75 hover:bg-sidebar-accent hover:text-sidebar-foreground border border-sidebar-border/50"
+                    }`}
+                  >
+                    {r.label}
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -937,27 +955,18 @@ export default function GuestDemoWorkspace({
             </div>
 
             <div className="flex items-center gap-2 shrink-0">
-              <Button
-                type="button"
-                size="sm"
-                onClick={() => setLocation("/presentation")}
-                className="h-9 rounded-full bg-primary text-primary-foreground font-bold text-xs px-3.5 sm:px-4 gap-1.5 sm:gap-2 shadow-md hover:bg-primary/90 hover:scale-102 transition-all ring-2 ring-primary/30"
-              >
-                <Compass className="h-4 w-4 text-amber-300" />
-                <span className="font-bold tracking-tight">Presentation Deck</span>
-                <Badge variant="secondary" className="hidden md:inline-flex text-[9px] px-1.5 py-0 bg-primary-foreground/20 text-primary-foreground">
-                  22 Slides
-                </Badge>
-              </Button>
-
-              <Badge variant="outline" className="hidden lg:inline-flex rounded-full text-[11px] gap-1 border-primary/30 text-primary font-medium">
+              <div className="hidden md:flex items-center">
+                <DemoRoleBar compact />
+              </div>
+              <ThemeToggle compact />
+              <Badge variant="outline" className="hidden sm:inline-flex rounded-full text-[11px] gap-1 border-primary/30 text-primary font-medium">
                 <Sparkles className="h-3 w-3" /> {role.toUpperCase()}
               </Badge>
             </div>
           </header>
 
           <main className="mx-auto max-w-6xl w-full p-4 sm:p-6 lg:p-8 flex-1 pb-24 lg:pb-8">
-            {isPageLoading ? <DemoWorkspaceSkeleton /> : <DemoContent path={path} notify={notify} />}
+            <DemoContent path={path} notify={notify} />
           </main>
         </div>
       </div>
@@ -1044,17 +1053,17 @@ export default function GuestDemoWorkspace({
         <button
           type="button"
           onClick={() => {
-            setLocation("/presentation");
+            setLocation("/goals");
             setMobileOpen(false);
           }}
           className={`flex flex-col items-center justify-center gap-1 py-1.5 px-3 rounded-xl text-[11px] font-medium transition-colors ${
-            path === "/presentation"
-              ? "text-amber-600 dark:text-amber-400 font-semibold"
-              : "text-amber-700/75 dark:text-amber-300/75 hover:text-amber-600"
+            path === "/goals"
+              ? "text-primary font-semibold"
+              : "text-muted-foreground hover:text-foreground"
           }`}
         >
-          <Compass className="h-5 w-5 text-amber-600 dark:text-amber-400" />
-          <span>Deck</span>
+          <Goal className="h-5 w-5" />
+          <span>Goals</span>
         </button>
 
         <button

@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -1620,50 +1621,78 @@ export default function Admin() {
             {/* List of Published Issues */}
             <div className="space-y-3">
               <h3 className="font-serif text-lg font-semibold text-foreground">Archived Editions</h3>
-              {filteredIssues.map((issue: any) => (
-                <div
-                  key={issue.id}
-                  className="p-4 rounded-2xl border border-border/70 bg-card/85 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4"
-                >
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="capitalize text-[10px] rounded-full">
-                        {issue.type}
-                      </Badge>
-                      <span className="text-[11px] text-muted-foreground">
-                        {new Date(issue.createdAt).toLocaleDateString()}
-                      </span>
+              {issuesQuery.isLoading ? (
+                <div className="space-y-3">
+                  {[1, 2, 3].map((item) => (
+                    <div
+                      key={item}
+                      className="p-4 rounded-2xl border border-border/70 bg-card/85 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                    >
+                      <div className="space-y-2 flex-1">
+                        <div className="flex items-center gap-2">
+                          <Skeleton className="h-4 w-16 rounded-full" />
+                          <Skeleton className="h-3 w-20" />
+                        </div>
+                        <Skeleton className="h-5 w-3/4 max-w-sm" />
+                        <Skeleton className="h-3 w-full max-w-md" />
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <Skeleton className="h-8 w-16 rounded-xl" />
+                        <Skeleton className="h-8 w-16 rounded-xl" />
+                      </div>
                     </div>
-                    <h4 className="font-serif font-semibold text-base">{issue.subject}</h4>
-                    <p className="text-xs text-muted-foreground line-clamp-2">{issue.body}</p>
-                  </div>
-
-                  <div className="flex items-center gap-2 shrink-0">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleEditIssue(issue)}
-                      className="rounded-xl h-8 text-xs gap-1"
-                    >
-                      <Pencil className="h-3 w-3" /> Edit
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() =>
-                        setPendingDestructive({
-                          kind: "deleteIssue",
-                          id: issue.id,
-                          label: issue.subject,
-                        })
-                      }
-                      className="rounded-xl h-8 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 gap-1"
-                    >
-                      <Trash2 className="h-3 w-3" /> Delete
-                    </Button>
-                  </div>
+                  ))}
                 </div>
-              ))}
+              ) : filteredIssues.length > 0 ? (
+                filteredIssues.map((issue: any) => (
+                  <div
+                    key={issue.id}
+                    className="p-4 rounded-2xl border border-border/70 bg-card/85 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  >
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="capitalize text-[10px] rounded-full">
+                          {issue.type}
+                        </Badge>
+                        <span className="text-[11px] text-muted-foreground">
+                          {new Date(issue.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
+                      <h4 className="font-serif font-semibold text-base">{issue.subject}</h4>
+                      <p className="text-xs text-muted-foreground line-clamp-2">{issue.body}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleEditIssue(issue)}
+                        className="rounded-xl h-8 text-xs gap-1"
+                      >
+                        <Pencil className="h-3 w-3" /> Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() =>
+                          setPendingDestructive({
+                            kind: "deleteIssue",
+                            id: issue.id,
+                            label: issue.subject,
+                          })
+                        }
+                        className="rounded-xl h-8 text-xs border-destructive/30 text-destructive hover:bg-destructive/10 gap-1"
+                      >
+                        <Trash2 className="h-3 w-3" /> Delete
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <div className="p-8 rounded-2xl border border-dashed border-border/70 text-center text-sm text-muted-foreground">
+                  No archived editions found. Create your first edition above.
+                </div>
+              )}
             </div>
           </div>
         )}

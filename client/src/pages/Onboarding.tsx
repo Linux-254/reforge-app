@@ -6,6 +6,7 @@ import { Slider } from "@/components/ui/slider";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import { dimensions21 } from "@/lib/site-content";
 import {
   ArrowLeft,
@@ -223,8 +224,26 @@ export default function Onboarding() {
 
   if (dimsQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-stone-50 flex items-center justify-center">
-        <div className="text-stone-500">Loading your assessment…</div>
+      <div className="min-h-screen bg-stone-50 flex flex-col justify-between p-4 md:p-8" aria-label="Loading your assessment">
+        <div className="max-w-2xl w-full mx-auto my-auto py-8 space-y-6">
+          <Skeleton className="h-2 w-full rounded-full" />
+          <div className="bg-white rounded-2xl border border-stone-200 p-6 md:p-10 shadow-sm min-h-[460px] flex flex-col justify-between space-y-6">
+            <div className="text-center space-y-6 flex flex-col items-center">
+              <Skeleton className="w-16 h-16 rounded-full" />
+              <Skeleton className="h-8 w-64 rounded-md" />
+              <div className="space-y-2 w-full max-w-xl">
+                <Skeleton className="h-4 w-full rounded-sm" />
+                <Skeleton className="h-4 w-5/6 mx-auto rounded-sm" />
+                <Skeleton className="h-4 w-3/4 mx-auto rounded-sm" />
+              </div>
+              <Skeleton className="h-4 w-48 rounded-sm" />
+            </div>
+            <div className="flex items-center justify-between pt-6 border-t border-stone-100">
+              <Skeleton className="h-10 w-24 rounded-md" />
+              <Skeleton className="h-11 w-28 rounded-md" />
+            </div>
+          </div>
+        </div>
       </div>
     );
   }

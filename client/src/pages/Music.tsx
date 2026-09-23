@@ -65,9 +65,61 @@ export default function MusicPage() {
 
   if (profileQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <Skeleton className="h-96 w-full" />
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100" aria-label="Loading music and sound settings">
+        {/* Top bar skeleton */}
+        <div className="bg-white border-b border-slate-200">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
+            <Skeleton className="h-9 w-20 rounded-md" />
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-36 rounded-md" />
+              <Skeleton className="h-4 w-64 rounded-sm" />
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+          {/* Sound Map Card Skeleton */}
+          <Card>
+            <CardHeader className="space-y-2">
+              <Skeleton className="h-6 w-36 rounded-md" />
+              <Skeleton className="h-4 w-full max-w-md rounded-sm" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-40 rounded-sm" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-40 rounded-sm" />
+                <Skeleton className="h-10 w-full rounded-md" />
+              </div>
+              <Skeleton className="h-10 w-32 rounded-md" />
+            </CardContent>
+          </Card>
+
+          {/* Safe Playlists Section Skeleton */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-6 w-32 rounded-md" />
+              <Skeleton className="h-9 w-28 rounded-md" />
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              {[1, 2, 3, 4].map((i) => (
+                <Card key={i}>
+                  <CardContent className="pt-6 space-y-3">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="h-10 w-10 rounded-lg shrink-0" />
+                      <div className="space-y-1 flex-1">
+                        <Skeleton className="h-5 w-32 rounded-md" />
+                        <Skeleton className="h-3 w-20 rounded-sm" />
+                      </div>
+                    </div>
+                    <Skeleton className="h-3 w-full rounded-sm" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

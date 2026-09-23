@@ -85,10 +85,70 @@ export default function Progress() {
 
   if (scoresQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-stone-50">
-        <div className="max-w-5xl mx-auto px-4 py-8">
-          <Skeleton className="h-72 w-full mb-6" />
-          <Skeleton className="h-96 w-full" />
+      <div className="min-h-screen bg-stone-50" aria-label="Loading your progress">
+        {/* Navigation skeleton */}
+        <nav className="bg-white border-b border-stone-200 sticky top-0 z-40">
+          <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-8 w-8 rounded-md" />
+              <Skeleton className="h-6 w-24 rounded-md" />
+            </div>
+            <Skeleton className="h-4 w-32 rounded-md" />
+          </div>
+        </nav>
+
+        <div className="max-w-5xl mx-auto px-4 py-8 space-y-8">
+          {/* Header Row Skeleton */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="space-y-2">
+              <Skeleton className="h-8 w-44 rounded-md" />
+              <Skeleton className="h-4 w-72 rounded-sm" />
+            </div>
+            <Card className="w-full sm:w-64">
+              <CardHeader className="pb-2 space-y-1">
+                <Skeleton className="h-4 w-36 rounded-sm" />
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-end gap-2">
+                  <Skeleton className="h-9 w-16 rounded-md" />
+                  <Skeleton className="h-4 w-10 rounded-sm mb-1" />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* History Chart Card Skeleton */}
+          <Card>
+            <CardHeader className="space-y-2">
+              <Skeleton className="h-6 w-40 rounded-md" />
+              <Skeleton className="h-4 w-60 rounded-sm" />
+            </CardHeader>
+            <CardContent>
+              <Skeleton className="h-64 w-full rounded-xl" />
+            </CardContent>
+          </Card>
+
+          {/* Dimension Cards Grid Skeleton */}
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-48 rounded-md" />
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <Card key={i}>
+                  <CardHeader className="pb-2 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Skeleton className="h-4 w-20 rounded-full" />
+                      <Skeleton className="h-5 w-12 rounded-md" />
+                    </div>
+                    <Skeleton className="h-5 w-32 rounded-md" />
+                  </CardHeader>
+                  <CardContent className="space-y-2">
+                    <Skeleton className="h-2 w-full rounded-full" />
+                    <Skeleton className="h-3 w-40 rounded-sm" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     );

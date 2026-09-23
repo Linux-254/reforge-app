@@ -65,12 +65,12 @@ const DEMO_ROLE_KEY = "reforge_active_demo_role";
 const DEMO_ROLE_CHANGE_EVENT = "reforge:demo-role-change";
 
 export function getStoredDemoRole(): DemoRole {
-  if (typeof window === "undefined") return "admin";
+  if (typeof window === "undefined") return "member";
   const stored = localStorage.getItem(DEMO_ROLE_KEY) as DemoRole | null;
   if (stored && stored in DEMO_PROFILES) {
     return stored;
   }
-  return "admin";
+  return "member";
 }
 
 export function setStoredDemoRole(role: DemoRole) {

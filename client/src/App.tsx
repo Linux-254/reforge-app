@@ -26,8 +26,6 @@ import Guides from "@/pages/Guides";
 import Community from "@/pages/Community";
 import Settings from "@/pages/Settings";
 import OnboardingPage from "@/pages/Onboarding";
-import PresentationPage from "@/pages/Presentation";
-import { InteractiveTourGuide } from "@/components/InteractiveTourGuide";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
@@ -64,7 +62,6 @@ function Router() {
       <Route path={"/settings"} component={Settings} />
       <Route path={"/admin"} component={Admin} />
       <Route path={"/onboarding"} component={OnboardingPage} />
-      <Route path={"/presentation"} component={PresentationPage} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -79,7 +76,6 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <OAuthLoadingOverlay />
-          <InteractiveTourGuide />
           <Router />
         </TooltipProvider>
       </ThemeProvider>

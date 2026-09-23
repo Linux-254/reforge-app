@@ -2,8 +2,9 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import ThemeToggle from "@/components/ThemeToggle";
-import { Leaf, Menu, ArrowUpRight, X, Sparkles, ShieldCheck, Compass } from "lucide-react";
+import { Leaf, Menu, ArrowUpRight, X, Sparkles, ShieldCheck, Compass, User, HeartHandshake, Stethoscope } from "lucide-react";
 import { BrandLogoIcon } from "@/components/BrandLogo";
+import { useDemoSession, DemoRole } from "@/lib/demoSession";
 
 const navLinks = [
   { href: "/how-it-works", label: "How it works" },
@@ -39,17 +40,56 @@ const footerColumns = [
 
 export function SiteLayout({ children }: { children: React.ReactNode }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [location] = useLocation();
+  const [location, setLocation] = useLocation();
+  const { setRole } = useDemoSession();
+
+  const launchAsRole = (roleKey: DemoRole) => {
+    setRole(roleKey);
+    if (roleKey === "admin") {
+      setLocation("/admin");
+    } else {
+      setLocation("/dashboard");
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col selection:bg-primary/20 selection:text-primary">
-      {/* Top Demo Banner */}
-      <div className="border-b border-primary/20 bg-primary/10 px-4 py-1.5 text-center text-xs font-medium text-primary flex items-center justify-center gap-2">
-        <Sparkles className="h-3.5 w-3.5" />
-        <span>Open Public Demo: Explore all recovery tools and roles without signing in.</span>
-        <Link href="/dashboard" className="underline font-bold hover:text-primary/80">
-          Open Demo →
-        </Link>
+      {/* Top Interactive Demo Banner with all 4 Role launchers */}
+      <div className="border-b border-primary/20 bg-primary/10 px-3 sm:px-4 py-1.5 text-center text-xs font-medium text-primary flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+        <div className="flex items-center gap-1.5 font-semibold">
+          <Sparkles className="h-3.5 w-3.5 shrink-0" />
+          <span>Demo Sandbox:</span>
+        </div>
+        <div className="flex flex-wrap items-center gap-1.5">
+          <button
+            type="button"
+            onClick={() => launchAsRole("member")}
+            className="inline-flex items-center gap-1 rounded-full bg-background/80 hover:bg-background px-2.5 py-0.5 text-[11px] font-semibold text-foreground/80 hover:text-primary shadow-2xs border border-border/60 transition-colors"
+          >
+            <User className="h-3 w-3 text-emerald-600" /> Member (Sam)
+          </button>
+          <button
+            type="button"
+            onClick={() => launchAsRole("supporter")}
+            className="inline-flex items-center gap-1 rounded-full bg-background/80 hover:bg-background px-2.5 py-0.5 text-[11px] font-semibold text-foreground/80 hover:text-primary shadow-2xs border border-border/60 transition-colors"
+          >
+            <HeartHandshake className="h-3 w-3 text-amber-600" /> Supporter (Sarah)
+          </button>
+          <button
+            type="button"
+            onClick={() => launchAsRole("coach")}
+            className="inline-flex items-center gap-1 rounded-full bg-background/80 hover:bg-background px-2.5 py-0.5 text-[11px] font-semibold text-foreground/80 hover:text-primary shadow-2xs border border-border/60 transition-colors"
+          >
+            <Stethoscope className="h-3 w-3 text-purple-600" /> Coach (Dr. Marcus)
+          </button>
+          <button
+            type="button"
+            onClick={() => launchAsRole("admin")}
+            className="inline-flex items-center gap-1 rounded-full bg-background/80 hover:bg-background px-2.5 py-0.5 text-[11px] font-semibold text-foreground/80 hover:text-primary shadow-2xs border border-border/60 transition-colors"
+          >
+            <ShieldCheck className="h-3 w-3 text-primary" /> Admin (Alex)
+          </button>
+        </div>
       </div>
 
       {/* Main Header */}
@@ -81,12 +121,6 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
 
           <div className="flex items-center gap-2">
             <ThemeToggle compact />
-            
-            <Button asChild variant="outline" size="sm" className="hidden sm:inline-flex rounded-full text-xs font-semibold border-amber-600/40 text-amber-900 dark:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20">
-              <Link href="/presentation">
-                <Compass className="mr-1.5 h-3.5 w-3.5 text-amber-600 dark:text-amber-400" /> Presentation Deck
-              </Link>
-            </Button>
 
             <Button asChild variant="outline" size="sm" className="hidden md:inline-flex rounded-full text-xs">
               <Link href="/admin">
@@ -127,16 +161,39 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
                 </Link>
               ))}
               <div className="pt-2 flex flex-col gap-2">
-                <Button asChild className="w-full rounded-full text-xs font-semibold" onClick={() => setMobileMenuOpen(false)}>
-                  <Link href="/presentation">
-                    <Compass className="mr-1.5 h-4 w-4" /> Presentation Deck (22 Slides)
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" className="w-full rounded-full text-xs" onClick={() => setMobileMenuOpen(false)}>
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">Launch As Persona:</p>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => { setMobileMenuOpen(false); launchAsRole("member"); }}
+                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
+                  >
+                    👤 Member (Sam)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setMobileMenuOpen(false); launchAsRole("supporter"); }}
+                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
+                  >
+                    🤝 Supporter (Sarah)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setMobileMenuOpen(false); launchAsRole("coach"); }}
+                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
+                  >
+                    🩺 Coach (Marcus)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => { setMobileMenuOpen(false); launchAsRole("admin"); }}
+                    className="p-2 rounded-xl border border-border/60 bg-muted/40 text-xs text-left font-medium hover:bg-primary/10"
+                  >
+                    🛡️ Admin (Alex)
+                  </button>
+                </div>
+                <Button asChild className="w-full rounded-full text-xs font-semibold mt-2" onClick={() => setMobileMenuOpen(false)}>
                   <Link href="/dashboard">Enter Demo Workspace</Link>
-                </Button>
-                <Button asChild variant="outline" className="w-full rounded-full text-xs" onClick={() => setMobileMenuOpen(false)}>
-                  <Link href="/admin">Admin Studio</Link>
                 </Button>
               </div>
             </nav>
@@ -160,13 +217,38 @@ export function SiteLayout({ children }: { children: React.ReactNode }) {
               <p className="mt-4 max-w-xs text-sm leading-6 text-white/70">
                 A gentle, evidence-based whole-life recovery companion for the honest work of becoming well again.
               </p>
-              <div className="mt-4 flex gap-2">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#f2d39c] hover:underline"
-                >
-                  <Sparkles className="h-3.5 w-3.5" /> Launch Demo Roles
-                </Link>
+              <div className="mt-4 flex flex-col gap-2">
+                <p className="text-xs font-semibold text-[#f2d39c]/90 uppercase tracking-wider">Launch Persona Demos:</p>
+                <div className="flex flex-wrap gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => launchAsRole("member")}
+                    className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+                  >
+                    👤 Member
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => launchAsRole("supporter")}
+                    className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+                  >
+                    🤝 Supporter
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => launchAsRole("coach")}
+                    className="text-xs px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+                  >
+                    🩺 Coach
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => launchAsRole("admin")}
+                    className="text-xs px-2.5 py-1 rounded-full bg-[#f2d39c]/20 hover:bg-[#f2d39c]/30 text-[#f2d39c] font-semibold transition-colors"
+                  >
+                    🛡️ Admin
+                  </button>
+                </div>
               </div>
             </div>
             {footerColumns.map((column) => (

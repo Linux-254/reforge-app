@@ -27,23 +27,9 @@ export default function Home() {
             >
               Re<span className="text-amber-600 font-extrabold">Forge</span>
             </button>
-            
-            {/* Immediate Presentation Deck Nav Near Logo */}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => setLocation("/presentation")}
-              className="h-8 rounded-full text-xs font-bold gap-1.5 border-amber-600/40 text-amber-900 bg-amber-50 hover:bg-amber-100 shadow-xs"
-            >
-              <Compass className="h-3.5 w-3.5 text-amber-700" />
-              <span>Presentation Deck</span>
-            </Button>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            <Button variant="ghost" size="sm" onClick={() => setLocation("/presentation")} className="hidden sm:inline-flex text-xs font-semibold text-slate-700">
-              Interactive Deck
-            </Button>
             <Button variant="ghost" size="sm" onClick={() => setLocation("/#features")} className="hidden md:inline-flex text-xs">
               Features
             </Button>
@@ -66,15 +52,6 @@ export default function Home() {
           <Button size="lg" onClick={() => setLocation("/dashboard")} className="rounded-full bg-slate-900 text-white hover:bg-slate-800 font-bold px-7">
             Try Live Demo
             <ArrowRight className="ml-2 h-5 w-5" />
-          </Button>
-          <Button
-            size="lg"
-            variant="outline"
-            onClick={() => setLocation("/presentation")}
-            className="rounded-full border-amber-600/50 text-amber-900 bg-amber-50/80 hover:bg-amber-100/80 font-bold px-7 gap-2 shadow-xs"
-          >
-            <Compass className="h-5 w-5 text-amber-700" />
-            Presentation Deck
           </Button>
         </div>
       </section>

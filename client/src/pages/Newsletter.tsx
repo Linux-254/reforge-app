@@ -166,9 +166,61 @@ export default function Newsletter() {
 
   if (statusQuery.isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50">
-        <div className="max-w-3xl mx-auto px-4 py-8">
-          <Skeleton className="h-96 w-full" />
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100" aria-label="Loading newsletter settings">
+        {/* Top bar skeleton */}
+        <div className="bg-white border-b border-slate-200">
+          <div className="max-w-3xl mx-auto px-4 py-4 flex items-center gap-4">
+            <Skeleton className="h-9 w-20 rounded-md" />
+            <div className="space-y-1">
+              <Skeleton className="h-6 w-32 rounded-md" />
+              <Skeleton className="h-4 w-60 rounded-sm" />
+            </div>
+          </div>
+        </div>
+
+        <div className="max-w-3xl mx-auto px-4 py-8 space-y-8">
+          {/* Status & Preferences Card Skeleton */}
+          <Card className="mb-8">
+            <CardHeader className="space-y-2">
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-5 w-5 rounded-full" />
+                <Skeleton className="h-6 w-36 rounded-md" />
+              </div>
+              <Skeleton className="h-4 w-48 rounded-sm" />
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div className="space-y-3">
+                <Skeleton className="h-4 w-48 rounded-sm" />
+                {[1, 2, 3].map((i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <Skeleton className="h-4 w-4 rounded-sm" />
+                    <Skeleton className="h-4 w-52 rounded-sm" />
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-3 pt-2">
+                <Skeleton className="h-10 w-36 rounded-md" />
+                <Skeleton className="h-10 w-28 rounded-md" />
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Past issues list skeleton */}
+          <div className="space-y-4">
+            <Skeleton className="h-6 w-40 rounded-md" />
+            {[1, 2, 3].map((i) => (
+              <Card key={i}>
+                <CardContent className="pt-6 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <Skeleton className="h-5 w-20 rounded-full" />
+                    <Skeleton className="h-4 w-28 rounded-sm" />
+                  </div>
+                  <Skeleton className="h-6 w-3/4 rounded-md" />
+                  <Skeleton className="h-4 w-full rounded-sm" />
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
       </div>
     );

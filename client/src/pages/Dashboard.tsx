@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   ArrowRight,
   BookOpen,
@@ -55,10 +56,97 @@ export default function Dashboard() {
   if (isLoading) {
     return (
       <DashboardLayout>
-        <div className="mx-auto max-w-6xl space-y-6">
-          <div className="h-72 animate-pulse rounded-[2rem] bg-muted/50" />
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 6 }).map((_, index) => <div key={index} className="h-32 animate-pulse rounded-2xl bg-muted/50" />)}
+        <div className="mx-auto max-w-6xl space-y-7" aria-label="Loading your dashboard">
+          {/* Hero Banner Skeleton */}
+          <div className="relative overflow-hidden rounded-[2rem] border border-border/60 bg-muted/40 p-7 sm:p-10">
+            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-end">
+              <div className="space-y-4 max-w-2xl">
+                <Skeleton className="h-5 w-36 rounded-full" />
+                <Skeleton className="h-10 w-3/4 max-w-md rounded-xl" />
+                <Skeleton className="h-4 w-full max-w-lg rounded-md" />
+                <Skeleton className="h-4 w-2/3 max-w-md rounded-md" />
+                <div className="flex flex-wrap gap-3 pt-2">
+                  <Skeleton className="h-10 w-36 rounded-full" />
+                  <Skeleton className="h-10 w-32 rounded-full" />
+                </div>
+              </div>
+              <div className="grid min-w-[220px] gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <div className="rounded-2xl border border-border/50 bg-card/50 p-4 space-y-2">
+                  <Skeleton className="h-4 w-28 rounded-md" />
+                  <Skeleton className="h-8 w-20 rounded-md" />
+                </div>
+                <div className="rounded-2xl border border-border/50 bg-card/50 p-4 space-y-2">
+                  <Skeleton className="h-4 w-28 rounded-md" />
+                  <Skeleton className="h-8 w-20 rounded-md" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Section Grid: Mood trend & Today's check-in & Progress */}
+          <div className="grid gap-6 lg:grid-cols-[1.15fr_.85fr]">
+            <Card className="nature-card lg:col-span-2">
+              <CardHeader className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-44 rounded-lg" />
+                  <Skeleton className="h-5 w-28 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-72 rounded-md" />
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-7 items-end gap-2 pt-4">
+                  {[40, 65, 80, 50, 75, 60, 85].map((val, i) => (
+                    <div key={i} className="flex flex-col items-center gap-2">
+                      <Skeleton className="w-full rounded-xl" style={{ height: `${val + 20}px` }} />
+                      <Skeleton className="h-3 w-8 rounded-sm" />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="nature-card">
+              <CardHeader className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-6 w-36 rounded-lg" />
+                  <Skeleton className="h-5 w-16 rounded-full" />
+                </div>
+                <Skeleton className="h-4 w-48 rounded-md" />
+              </CardHeader>
+              <CardContent className="grid gap-3 sm:grid-cols-2">
+                <Skeleton className="h-28 rounded-2xl" />
+                <Skeleton className="h-28 rounded-2xl" />
+              </CardContent>
+            </Card>
+
+            <Card className="nature-card lg:col-span-2">
+              <CardHeader className="space-y-2">
+                <Skeleton className="h-6 w-48 rounded-lg" />
+                <Skeleton className="h-4 w-64 rounded-md" />
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <Skeleton className="h-10 w-24 rounded-lg" />
+                <Skeleton className="h-2 w-full rounded-full" />
+                <Skeleton className="h-10 w-full rounded-full" />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Quick links doorway skeleton grid */}
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <Skeleton className="h-4 w-32 rounded-md" />
+              <Skeleton className="h-7 w-48 rounded-lg" />
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="rounded-2xl border border-border/60 bg-card/60 p-4 space-y-3">
+                  <Skeleton className="h-10 w-10 rounded-xl" />
+                  <Skeleton className="h-5 w-24 rounded-md" />
+                  <Skeleton className="h-4 w-40 rounded-md" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </DashboardLayout>
@@ -121,7 +209,7 @@ export default function Dashboard() {
             <Card className="nature-card h-full">
               <CardHeader><div className="flex items-center justify-between gap-4"><div><CardTitle className="font-serif text-2xl">Your recent mood</CardTitle><CardDescription>A small pattern, not a verdict. Check-ins stay private to you.</CardDescription></div><Badge variant="secondary" className="rounded-full">Last 7 check-ins</Badge></div></CardHeader>
               <CardContent>
-                {moodTrendState === "loading" ? <div className="h-24 animate-pulse rounded-2xl bg-muted/50" aria-label="Loading mood trend" /> : moodTrendState === "error" ? <div className="flex items-center justify-between gap-4 rounded-2xl border border-destructive/25 bg-destructive/5 p-4 text-sm"><span className="text-destructive">Mood history is taking a pause. Your saved check-ins are unchanged.</span><Button variant="outline" size="sm" onClick={() => void moodHistoryQuery.refetch()} className="shrink-0 rounded-full">Try again</Button></div> : moodTrendState === "ready" ? <div className="grid grid-cols-7 items-end gap-2" role="img" aria-label={`Mood trend from ${moodPoints.length} recent check-ins`}>
+                {moodTrendState === "loading" ? <Skeleton className="h-24 w-full rounded-2xl" aria-label="Loading mood trend" /> : moodTrendState === "error" ? <div className="flex items-center justify-between gap-4 rounded-2xl border border-destructive/25 bg-destructive/5 p-4 text-sm"><span className="text-destructive">Mood history is taking a pause. Your saved check-ins are unchanged.</span><Button variant="outline" size="sm" onClick={() => void moodHistoryQuery.refetch()} className="shrink-0 rounded-full">Try again</Button></div> : moodTrendState === "ready" ? <div className="grid grid-cols-7 items-end gap-2" role="img" aria-label={`Mood trend from ${moodPoints.length} recent check-ins`}>
                   {moodPoints.map((entry, index) => { const mood = entry.mood ?? 0; return <div key={`${entry.id}-${index}`} className="flex min-w-0 flex-col items-center gap-2"><div className="flex h-24 w-full items-end rounded-xl bg-primary/8 p-1"><div className="w-full rounded-lg bg-primary transition-[height] duration-200" style={{ height: `${Math.max(10, mood * 10)}%` }} title={`Mood ${mood} out of 10`} /></div><span className="text-[10px] text-muted-foreground">{new Date(entry.createdAt).toLocaleDateString(undefined, { weekday: "short" })}</span><span className="text-xs font-semibold text-primary">{mood}/10</span></div>; })}
                 </div> : <p className="rounded-2xl border border-dashed border-border/70 p-5 text-sm text-muted-foreground">Complete a check-in to begin noticing your mood rhythm.</p>}
               </CardContent>

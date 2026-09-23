@@ -21,7 +21,7 @@ const corsOrigins = (ENV.corsOrigins || "")
 
 const globalApiLimiter = rateLimit({
   windowMs: 60 * 1000,
-  limit: 120,
+  limit: 1000,
   standardHeaders: true,
   legacyHeaders: false,
   message: {
@@ -87,7 +87,15 @@ async function startServer() {
 
   app.set("trust proxy", 1);
 
-  app.use(helmet({ contentSecurityPolicy: false }));
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      frameguard: false,
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: false,
+      crossOriginResourcePolicy: false,
+    })
+  );
   app.use(
     cors({
       // Never reflect arbitrary origins when no explicit allowlist is configured.
@@ -105,23 +113,6 @@ async function startServer() {
 
   registerStorageProxy(app);
   registerOAuthRoutes(app);
-
-  // Standalone client presentation download endpoints
-  app.get(["/api/presentation/download", "/download/presentation"], (req, res) => {
-    const candidates = [
-      path.resolve(process.cwd(), "client/public/ReForge_Executive_Client_Presentation.html"),
-      path.resolve(process.cwd(), "dist/public/ReForge_Executive_Client_Presentation.html"),
-      path.resolve(process.cwd(), "public/ReForge_Executive_Client_Presentation.html"),
-    ];
-    const targetFile = candidates.find(f => fs.existsSync(f));
-    if (targetFile) {
-      res.setHeader("Content-Disposition", 'attachment; filename="ReForge_Executive_Client_Presentation.html"');
-      res.setHeader("Content-Type", "text/html; charset=utf-8");
-      res.sendFile(targetFile);
-    } else {
-      res.status(404).send("Presentation document not found.");
-    }
-  });
 
   // CSRF defense-in-depth for browser mutations. OAuth callbacks are GET requests
   // and remain outside this guard; API clients must use the configured same origin.
