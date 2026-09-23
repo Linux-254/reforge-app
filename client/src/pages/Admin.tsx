@@ -761,27 +761,8 @@ export default function Admin() {
       </header>
 
       <main className="mx-auto max-w-7xl px-4 sm:px-6 pt-6 space-y-6">
-        {/* Role Notice Banner if not logged as Alex Rivera */}
-        {role !== "admin" && (
-          <div className="p-4 rounded-2xl border border-primary/25 bg-primary/10 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2.5">
-              <Sparkles className="h-4 w-4 text-primary shrink-0" />
-              <span>
-                You are currently previewing with <strong>{user.name} ({role})</strong>. In this demo sandbox, all admin content and CRUD tools remain 100% unlocked for your review.
-              </span>
-            </div>
-            <Button
-              size="sm"
-              onClick={() => setRole("admin")}
-              className="rounded-full h-7 text-xs bg-primary text-primary-foreground shrink-0"
-            >
-              Switch to Alex Rivera (Admin)
-            </Button>
-          </div>
-        )}
-
         {/* =========================================================================
-            ADMIN MODULE NAVIGATION HUB (Dedicated Drawer / Menu & Quick Pills)
+            ADMIN MODULE NAVIGATION HUB (Dedicated Drawer / Menu)
            ========================================================================= */}
         {(() => {
           const adminModulesList: {
